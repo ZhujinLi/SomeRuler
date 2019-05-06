@@ -40,6 +40,21 @@ ApplicationWindow {
         focus: true
         Keys.onEscapePressed: window.hide()
 
+        MouseArea {
+            anchors.fill: parent
+            property point pressPos: "0, 0"
+
+            onPressed: {
+                pressPos = Qt.point(mouse.x, mouse.y)
+            }
+
+            onPositionChanged: {
+                var delta = Qt.point(mouse.x-pressPos.x, mouse.y-pressPos.y)
+                window.x += delta.x;
+                window.y += delta.y;
+            }
+        }
+
         onPaint: {
             var ctx = canvas.getContext('2d')
 
