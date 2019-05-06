@@ -33,6 +33,28 @@ ApplicationWindow {
         }
     }
 
+    // Resize
+    MouseArea {
+        property int pressX: 0
+
+        width: 5
+
+        anchors {
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+        }
+
+        cursorShape: Qt.SizeHorCursor
+
+        onPressed: pressX = mouseX
+
+        onMouseXChanged: {
+            var dx = mouseX - pressX
+            window.setWidth(parent.width + dx)
+        }
+    }
+
     Canvas {
         id: canvas
         width: parent.width
@@ -40,16 +62,52 @@ ApplicationWindow {
         focus: true
         Keys.onEscapePressed: window.hide()
 
+        property string clickArea: "none"
+        property point clickPos: "0, 0"
+
+        // Select
         MouseArea {
-            anchors.fill: parent
             property point pressPos: "0, 0"
 
-            onPressed: {
-                pressPos = Qt.point(mouse.x, mouse.y)
+            anchors.fill: parent
+            anchors.rightMargin: 5
+
+            onPressed: pressPos = Qt.point(mouseX, mouseY)
+
+            onClicked: {
+                var releasePos = Qt.point(mouseX, mouseY)
+
+                if (pressPos == releasePos) {
+                    parent.clickArea = "select"
+                    parent.clickPos = Qt.point(mouseX, mouseY)
+                    parent.requestPaint()
+                }
+            }
+        }
+
+        // Drag
+        MouseArea {
+            property point pressPos: "0, 0"
+
+            anchors.fill: parent
+            anchors.rightMargin: 5
+            anchors.topMargin: 15
+            anchors.bottomMargin: 15
+
+            onPressed: pressPos = Qt.point(mouseX, mouseY)
+
+            onClicked: {
+                var releasePos = Qt.point(mouseX, mouseY)
+
+                if (pressPos == releasePos) {
+                    parent.clickArea = "drag"
+                    parent.clickPos = Qt.point(mouseX, mouseY)
+                    parent.requestPaint()
+                }
             }
 
             onPositionChanged: {
-                var delta = Qt.point(mouse.x-pressPos.x, mouse.y-pressPos.y)
+                var delta = Qt.point(mouseX-pressPos.x, mouseY-pressPos.y)
                 window.x += delta.x;
                 window.y += delta.y;
             }
@@ -57,6 +115,7 @@ ApplicationWindow {
 
         onPaint: {
             var ctx = canvas.getContext('2d')
+            ctx.clearRect(0, 0, width, height)
 
             // Background
             ctx.rect(0, 0, width, height)
@@ -64,19 +123,19 @@ ApplicationWindow {
             ctx.fill()
 
             // Ticks
-            ctx.strokeStyle = "black"
-            ctx.beginPath()
             for (var tick = 0; tick < width; tick++) {
                 if (tick % 2 == 0) {
+                    ctx.beginPath()
+                    ctx.strokeStyle = clickArea == "select" && (parseInt(clickPos.x) | 1) === (tick + 1) ? "red" : "black"
                     var len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5
                     ctx.moveTo(tick, 0)
                     ctx.lineTo(tick, len)
 
                     ctx.moveTo(tick, height)
                     ctx.lineTo(tick, height - len)
+                    ctx.stroke()
                 }
             }
-            ctx.stroke()
 
             // Labels
             ctx.fillStyle = "black"
@@ -92,7 +151,13 @@ ApplicationWindow {
 
             // Info
             ctx.textBaseline = "middle"
-            ctx.fillText(width + ' px', 15, height / 2)
+            if (clickArea == "none" || clickArea == "drag") {
+                ctx.fillStyle = "black"
+                ctx.fillText(width + ' px', 15, height / 2)
+            } else if (clickArea == "select") {
+                ctx.fillStyle = "red"
+                ctx.fillText(Math.round(clickPos.x) + ' px', 15, height / 2)
+            }
         }
     }
 }
