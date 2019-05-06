@@ -4,7 +4,7 @@ import Qt.labs.platform 1.0
 
 ApplicationWindow {
     id: window
-    flags: Qt.FramelessWindowHint
+    flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     visible: true
     title: qsTr("QkRuler")
     width: 400
@@ -20,6 +20,11 @@ ApplicationWindow {
     SystemTrayIcon {
         visible: true
         iconSource: "qrc:/images/qkruler-icon.png"
+
+        onActivated: {
+            if (reason === SystemTrayIcon.DoubleClick)
+                appear()
+        }
 
         menu: Menu {
             MenuItem {
@@ -68,17 +73,16 @@ ApplicationWindow {
 
         // Select
         MouseArea {
-            property point pressPos: "0, 0"
+            property bool clickValid: false
 
             anchors.fill: parent
             anchors.rightMargin: 5
 
-            onPressed: pressPos = Qt.point(mouseX, mouseY)
+            onPressed: clickValid = true
+            onPositionChanged: clickValid = false
 
             onClicked: {
-                var releasePos = Qt.point(mouseX, mouseY)
-
-                if (pressPos == releasePos) {
+                if (clickValid) {
                     parent.clickArea = "select"
                     parent.clickPos = Qt.point(mouseX, mouseY)
                     parent.requestPaint()
@@ -89,18 +93,20 @@ ApplicationWindow {
         // Drag
         MouseArea {
             property point pressPos: "0, 0"
+            property bool clickValid: false
 
             anchors.fill: parent
             anchors.rightMargin: 5
             anchors.topMargin: 15
             anchors.bottomMargin: 15
 
-            onPressed: pressPos = Qt.point(mouseX, mouseY)
+            onPressed: {
+                pressPos = Qt.point(mouseX, mouseY)
+                clickValid = true
+            }
 
             onClicked: {
-                var releasePos = Qt.point(mouseX, mouseY)
-
-                if (pressPos == releasePos) {
+                if (clickValid) {
                     parent.clickArea = "drag"
                     parent.clickPos = Qt.point(mouseX, mouseY)
                     parent.requestPaint()
@@ -111,6 +117,7 @@ ApplicationWindow {
                 var delta = Qt.point(mouseX-pressPos.x, mouseY-pressPos.y)
                 window.x += delta.x;
                 window.y += delta.y;
+                clickValid = false
             }
         }
 
