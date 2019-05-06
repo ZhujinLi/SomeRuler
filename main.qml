@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.4
 import Qt.labs.platform 1.0
+import QtQuick.Window 2.2
 
 ApplicationWindow {
     id: window
@@ -150,10 +151,10 @@ ApplicationWindow {
             for (tick = 0; tick < width; tick++) {
                 if (tick % 100 == 0) {
                     ctx.textBaseline = "top"
-                    ctx.fillText(tick, tick, 15)
+                    ctx.fillText(tick * Screen.devicePixelRatio, tick, 15)
 
                     ctx.textBaseline = "bottom"
-                    ctx.fillText(tick, tick, height - 15)
+                    ctx.fillText(tick * Screen.devicePixelRatio, tick, height - 15)
                 }
             }
 
@@ -161,10 +162,10 @@ ApplicationWindow {
             ctx.textBaseline = "middle"
             if (clickArea == "none" || clickArea == "drag") {
                 ctx.fillStyle = "black"
-                ctx.fillText(width + ' px', 15, height / 2)
+                ctx.fillText(width * Screen.devicePixelRatio + ' px', 15, height / 2)
             } else if (clickArea == "select") {
                 ctx.fillStyle = "red"
-                ctx.fillText(Math.round(clickPos.x) + ' px', 15, height / 2)
+                ctx.fillText(Math.round(clickPos.x) * Screen.devicePixelRatio + ' px', 15, height / 2)
             }
         }
     }
