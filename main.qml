@@ -56,6 +56,9 @@ ApplicationWindow {
                     var len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5
                     ctx.moveTo(tick, 0)
                     ctx.lineTo(tick, len)
+
+                    ctx.moveTo(tick, height)
+                    ctx.lineTo(tick, height - len)
                 }
             }
             ctx.stroke()
@@ -66,6 +69,7 @@ ApplicationWindow {
             for (tick = 0; tick < width; tick++) {
                 if (tick % 100 == 0) {
                     ctx.text(tick, tick, 25)
+                    ctx.text(tick, tick, height - 17)
                 }
             }
             ctx.fill()
