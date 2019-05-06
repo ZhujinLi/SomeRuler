@@ -51,7 +51,8 @@ ApplicationWindow {
 
         onMouseXChanged: {
             var dx = mouseX - pressX
-            window.setWidth(parent.width + dx)
+            var width = Math.max(150, parent.width + dx)
+            window.setWidth(width)
         }
     }
 
