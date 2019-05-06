@@ -8,7 +8,7 @@ ApplicationWindow {
     visible: true
     title: qsTr("QkRuler")
     width: 400
-    height: 75
+    height: 90
     color: "transparent"
 
     function appear() {
@@ -45,7 +45,7 @@ ApplicationWindow {
 
             // Background
             ctx.rect(0, 0, width, height)
-            ctx.fillStyle = "#80ffffff"
+            ctx.fillStyle = "#c0ffffff"
             ctx.fill()
 
             // Ticks
@@ -65,14 +65,19 @@ ApplicationWindow {
 
             // Labels
             ctx.fillStyle = "black"
-            ctx.beginPath()
             for (tick = 0; tick < width; tick++) {
                 if (tick % 100 == 0) {
-                    ctx.text(tick, tick, 25)
-                    ctx.text(tick, tick, height - 17)
+                    ctx.textBaseline = "top"
+                    ctx.fillText(tick, tick, 15)
+
+                    ctx.textBaseline = "bottom"
+                    ctx.fillText(tick, tick, height - 15)
                 }
             }
-            ctx.fill()
+
+            // Info
+            ctx.textBaseline = "middle"
+            ctx.fillText(width + ' px', 15, height / 2)
         }
     }
 }
