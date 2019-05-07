@@ -8,7 +8,7 @@ ApplicationWindow {
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     visible: true
     title: qsTr("QkRuler")
-    width: 400
+    width: 666
     height: 90
     color: "transparent"
 
@@ -124,12 +124,15 @@ ApplicationWindow {
 
         onPaint: {
             var ctx = canvas.getContext('2d')
+            ctx.font = "12px sans-serif"
             ctx.clearRect(0, 0, width, height)
 
             // Background
             ctx.rect(0, 0, width, height)
             ctx.fillStyle = "#c0ffffff"
             ctx.fill()
+            ctx.strokeStype = "black"
+            ctx.stroke()
 
             // Ticks
             for (var tick = 0; tick < width; tick++) {
@@ -137,11 +140,11 @@ ApplicationWindow {
                     ctx.beginPath()
                     ctx.strokeStyle = clickArea == "select" && (parseInt(clickPos.x) | 1) === (tick + 1) ? "red" : "black"
                     var len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5
-                    ctx.moveTo(tick, 0)
-                    ctx.lineTo(tick, len)
+                    ctx.moveTo(tick+.5, 0)
+                    ctx.lineTo(tick+.5, len)
 
-                    ctx.moveTo(tick, height)
-                    ctx.lineTo(tick, height - len)
+                    ctx.moveTo(tick+.5, height)
+                    ctx.lineTo(tick+.5, height - len)
                     ctx.stroke()
                 }
             }
