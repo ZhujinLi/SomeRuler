@@ -25,10 +25,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        geometrycalculator.cpp \
         main.cpp \
         qkruler.cpp
 
 HEADERS += \
+        geometrycalculator.h \
         qkruler.h
 
 # Default rules for deployment.

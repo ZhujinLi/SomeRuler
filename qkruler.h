@@ -1,6 +1,8 @@
 #ifndef QKRULER_H
 #define QKRULER_H
 
+#include "geometrycalculator.h"
+
 #include <QWidget>
 
 class QkRuler : public QWidget
@@ -11,13 +13,19 @@ public:
     QkRuler(QWidget *parent = nullptr);
     ~QkRuler() override;
 
+protected:
+    void keyReleaseEvent(QKeyEvent *event) override;
+
 private:
     void _appear();
     void _initTray();
 
+    GeometryCalculator m_geoCalc;
+
+
     // QWidget interface
-protected:
-    void keyReleaseEvent(QKeyEvent *event) override;
+public:
+    QSize sizeHint() const override;
 };
 
 #endif // QKRULER_H

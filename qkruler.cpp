@@ -9,6 +9,9 @@ QkRuler::QkRuler(QWidget *parent)
     : QWidget(parent, Qt::FramelessWindowHint)
 {
     _initTray();
+
+    m_geoCalc.setRulerSize(QSize{400, 100});
+    m_geoCalc.setRotation(30);
 }
 
 QkRuler::~QkRuler()
@@ -52,4 +55,10 @@ void QkRuler::keyReleaseEvent(QKeyEvent *event)
     default:
         break;
     }
+}
+
+
+QSize QkRuler::sizeHint() const
+{
+    return m_geoCalc.getWindowSize();
 }
