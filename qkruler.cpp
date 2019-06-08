@@ -1,8 +1,10 @@
 ﻿#include "qkruler.h"
 
+#include <QBitmap>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QMenu>
+#include <QPainter>
 #include <QSystemTrayIcon>
 
 QkRuler::QkRuler(QWidget *parent)
@@ -12,6 +14,8 @@ QkRuler::QkRuler(QWidget *parent)
 
     m_geoCalc.setRulerSize(QSize{400, 100});
     m_geoCalc.setRotation(30);
+
+    _updateMask();
 }
 
 QkRuler::~QkRuler()
@@ -61,4 +65,25 @@ void QkRuler::keyReleaseEvent(QKeyEvent *event)
 QSize QkRuler::sizeHint() const
 {
     return m_geoCalc.getWindowSize();
+}
+
+void QkRuler::_updateMask()
+{
+    QBitmap mask(m_geoCalc.getWindowSize());
+    mask.clear();
+
+    QPainter painter(&mask);
+    painter.setTransform(m_geoCalc.getTransform());
+    painter.setBrush(Qt::color1);
+    painter.drawRect(QRect{0, 0, m_geoCalc.getRulerSize().width(), m_geoCalc.getRulerSize().height()});
+
+    setMask(mask);
+}
+
+
+void QkRuler::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setBrush(QColor(0xff, 0, 0));
+    painter.drawRect(QRect{0, 0, this->geometry().width(), this->geometry().height()});
 }

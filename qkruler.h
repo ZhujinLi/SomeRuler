@@ -13,19 +13,19 @@ public:
     QkRuler(QWidget *parent = nullptr);
     ~QkRuler() override;
 
+    QSize sizeHint() const override;
+
 protected:
     void keyReleaseEvent(QKeyEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     void _appear();
     void _initTray();
+    void _updateMask();
 
     GeometryCalculator m_geoCalc;
 
-
-    // QWidget interface
-public:
-    QSize sizeHint() const override;
 };
 
 #endif // QKRULER_H
