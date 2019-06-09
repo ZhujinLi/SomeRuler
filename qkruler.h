@@ -37,6 +37,7 @@ private:
 
 private slots:
     void _reset();
+    void _about();
 };
 
 #endif // QKRULER_H

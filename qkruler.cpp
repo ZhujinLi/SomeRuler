@@ -10,6 +10,16 @@
 #include <QtDebug>
 #include <cmath>
 #include <QtMath>
+#include <QDialog>
+#include <QStyle>
+#include <QScreen>
+#include <QLayout>
+#include <QWindow>
+#include <ui_about.h>
+
+namespace Ui {
+class About;
+}
 
 static const int HANDLE_RADIUS = 4;
 static const int HANDLE_MARGIN = 20;
@@ -63,6 +73,10 @@ void QkRuler::_initTray()
     QAction* resetAction = new QAction(tr("&Reset"), this);
     connect(resetAction, &QAction::triggered, this, &QkRuler::_reset);
     trayIconMenu->addAction(resetAction);
+
+    QAction* aboutAction = new QAction(tr("&About..."), this);
+    connect(aboutAction, &QAction::triggered, this, &QkRuler::_about);
+    trayIconMenu->addAction(aboutAction);
 
     QAction* quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
@@ -210,6 +224,30 @@ void QkRuler::_reset()
     m_geoCalc.setRotation(0);
     resize(m_geoCalc.getWindowSize());
     _updateMask();
+}
+
+void QkRuler::_about()
+{
+    QDialog* dialog = new QDialog(this);
+    Ui::About aboutUi;
+    aboutUi.setupUi(dialog);
+    dialog->show();
+
+    QSize size = dialog->size();
+    qreal h = (aboutUi.textBrowser->document()->size().height() + dialog->layout()->margin() * 2) * 1.2;
+    size.setWidth(static_cast<int>(h * size.width() / size.height()));
+    size.setHeight(static_cast<int>(h));
+    dialog->setFixedSize(size);
+
+    QScreen* screen = dialog->window()->windowHandle()->screen();
+    dialog->setGeometry(
+        QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            dialog->size(),
+            screen->geometry()
+        )
+    );
 }
 
 void QkRuler::mousePressEvent(QMouseEvent *event)
