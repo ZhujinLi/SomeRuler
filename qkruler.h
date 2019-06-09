@@ -35,6 +35,8 @@ private:
     int m_selectedTick;
     bool m_cursorInHandleArea;
 
+private slots:
+    void _reset();
 };
 
 #endif // QKRULER_H

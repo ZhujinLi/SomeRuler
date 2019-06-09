@@ -32,11 +32,7 @@ QkRuler::QkRuler(QWidget *parent)
 
     _initTray();
 
-    m_geoCalc.setRulerSize(QSize{600, 100});
-    m_geoCalc.setRotation(0);
-    resize(m_geoCalc.getWindowSize());
-
-    _updateMask();
+    _reset();
 
     setMouseTracking(true);
 }
@@ -63,6 +59,10 @@ void QkRuler::_initTray()
     QAction* showAction = new QAction(tr("&Show"), this);
     connect(showAction, &QAction::triggered, this, &QkRuler::_appear);
     trayIconMenu->addAction(showAction);
+
+    QAction* resetAction = new QAction(tr("&Reset"), this);
+    connect(resetAction, &QAction::triggered, this, &QkRuler::_reset);
+    trayIconMenu->addAction(resetAction);
 
     QAction* quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
@@ -142,13 +142,14 @@ void QkRuler::paintEvent(QPaintEvent *)
     painter.setFont(font);
 
     // Rect
+    QRect rulerRect = QRect{0, 0, w, h};
     if (!m_cursorInHandleArea) {
         painter.setClipping(true);
         painter.setClipRegion(_handleMask());
     }
     painter.setTransform(m_geoCalc.getTransform()); // After setting clipper
     painter.setBrush(QColor(0xff, 0xff, 0xff, 0xc0));
-    painter.drawRect(QRect{0, 0, w, h});
+    painter.drawRect(rulerRect);
     painter.setClipping(false);
 
     // Ticks
@@ -169,9 +170,11 @@ void QkRuler::paintEvent(QPaintEvent *)
             QString label = QString::number(tick * devicePixelRatio());
 
             QRect upperRect(tick, 15, 100, 100);
+            upperRect &= rulerRect;
             painter.drawText(upperRect, Qt::AlignLeft | Qt::AlignTop, label);
 
             QRect lowerRect(tick, h - 15 - 100, 100, 100);
+            lowerRect &= rulerRect;
             painter.drawText(lowerRect, Qt::AlignLeft | Qt::AlignBottom, label);
         }
     }
@@ -199,6 +202,14 @@ bool QkRuler::_inHandleArea(QPoint pos)
     QRect handleArea(handlePos.x() - HANDLE_RADIUS * 2,
                          handlePos.y() - HANDLE_RADIUS * 2, HANDLE_RADIUS * 4, HANDLE_RADIUS * 4);
     return handleArea.contains(pos);
+}
+
+void QkRuler::_reset()
+{
+    m_geoCalc.setRulerLength(600);
+    m_geoCalc.setRotation(0);
+    resize(m_geoCalc.getWindowSize());
+    _updateMask();
 }
 
 void QkRuler::mousePressEvent(QMouseEvent *event)
@@ -229,10 +240,12 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
             QPoint delta = event->localPos().toPoint() - origin;
 
             int len = _QPoint_length(delta) + HANDLE_MARGIN;
-            m_geoCalc.setRulerSize(QSize{len, rulerSize.height()});
+            m_geoCalc.setRulerLength(len);
 
-            qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
-            m_geoCalc.setRotation(angle);
+            if (!QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)) {
+                qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
+                m_geoCalc.setRotation(angle);
+            }
 
             resize(m_geoCalc.getWindowSize());
             _updateMask();

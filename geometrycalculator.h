@@ -9,7 +9,7 @@ class GeometryCalculator
 public:
     GeometryCalculator();
 
-    void setRulerSize(QSize size);
+    void setRulerLength(int len);
 
     // Unit: degrees
     // It will be clamped to [0, 90].
