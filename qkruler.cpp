@@ -6,9 +6,11 @@
 #include <QMenu>
 #include <QPainter>
 #include <QSystemTrayIcon>
+#include <QtDebug>
 
 QkRuler::QkRuler(QWidget *parent)
-    : QWidget(parent, Qt::FramelessWindowHint)
+    : QWidget(parent, Qt::FramelessWindowHint),
+      m_selectedTick(-1)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -103,16 +105,18 @@ void QkRuler::paintEvent(QPaintEvent *)
     painter.setFont(font);
 
     // Ticks
-    painter.setPen(Qt::black);
     for (int tick = 0; tick < w; tick++) {
         if (tick % 2 == 0) {
             int len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5;
+            bool isSelected = tick == (m_selectedTick | 1) - 1;
+            painter.setPen(isSelected ? Qt::red : Qt::black);
             painter.drawLine(tick, 0, tick, len);
             painter.drawLine(tick, h,tick, h - len);
         }
     }
 
     // Labels
+    painter.setPen(Qt::black);
     for (int tick = 0; tick < w; tick++) {
         if (tick % 100 == 0) {
             QString label = QString::number(tick * devicePixelRatio());
@@ -126,7 +130,49 @@ void QkRuler::paintEvent(QPaintEvent *)
     }
 
     // Info
+    painter.setPen(m_selectedTick >= 0 ? Qt::red : Qt::black);
+    int num2Show = (m_selectedTick >= 0 ? m_selectedTick : w) * devicePixelRatio();
     QRect infoRect(15, 0, 100, h);
-    QString infoText = QString::number(w * devicePixelRatio()) + " px";
+    QString infoText = QString::number(num2Show) + " px";
     painter.drawText(infoRect, Qt::AlignLeft | Qt::AlignVCenter, infoText);
 }
+
+
+void QkRuler::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+        m_hasDragged = false;
+        event->accept();
+    }
+}
+
+void QkRuler::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton) {
+        if (event->globalPos() != m_dragPosition)
+            m_hasDragged = true;
+        move(event->globalPos() - m_dragPosition);
+        event->accept();
+    }
+}
+
+void QkRuler::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        QPoint rawPos = m_geoCalc.inversePos(event->localPos().toPoint());
+        bool inTickArea = rawPos.y() < 15 || rawPos.y() > m_geoCalc.getRulerSize().height() - 15;
+        if (m_hasDragged && !inTickArea) {
+            event->accept();
+        } else if (!m_hasDragged && inTickArea) {
+            m_selectedTick = rawPos.x();
+            update();
+            event->accept();
+        } else if(!m_hasDragged && !inTickArea) {
+            m_selectedTick = -1;
+            update();
+            event->accept();
+        }
+    }
+}
+

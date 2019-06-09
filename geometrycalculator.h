@@ -9,7 +9,7 @@ class GeometryCalculator
 public:
     GeometryCalculator();
 
-    void setRulerSize(const QSize& size) { m_rulerSize = size; }
+    void setRulerSize(const QSize& size);
     const QSize& getRulerSize() { return m_rulerSize; }
 
     // Unit: degrees
@@ -17,13 +17,21 @@ public:
     // Initial value: 0
     void setRotation(qreal rotation);
 
-    QSize getWindowSize() const;
+    QSize getWindowSize() const { return m_windowSize; }
 
-    QTransform getTransform() const;
+    QTransform getTransform() const { return m_transform; }
+
+    QPoint transformPos(const QPoint& pos) const;
+    QPoint inversePos(const QPoint& pos) const;
 
 private:
+    void _update();
+
     QSize m_rulerSize;
     qreal m_rotation;
+    QSize m_windowSize;
+    QTransform m_transform;
+    QTransform m_invTransform;
 };
 
 #endif // GEOMETRYCALCULATOR_H

@@ -18,6 +18,9 @@ public:
 protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
     void _appear();
@@ -25,6 +28,9 @@ private:
     void _updateMask();
 
     GeometryCalculator m_geoCalc;
+    QPoint m_dragPosition;
+    bool m_hasDragged;
+    int m_selectedTick;
 
 };
 
