@@ -13,8 +13,6 @@ public:
     QkRuler(QWidget *parent = nullptr);
     ~QkRuler() override;
 
-    QSize sizeHint() const override;
-
 protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
@@ -26,11 +24,16 @@ private:
     void _appear();
     void _initTray();
     void _updateMask();
+    QPoint _handlePos();
+    QBitmap _handleMask();
+    bool _inHandleArea(QPoint pos);
 
     GeometryCalculator m_geoCalc;
     QPoint m_dragPosition;
+    bool m_draggingHandle;
     bool m_hasDragged;
     int m_selectedTick;
+    bool m_cursorInHandleArea;
 
 };
 

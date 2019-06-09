@@ -9,13 +9,14 @@ class GeometryCalculator
 public:
     GeometryCalculator();
 
-    void setRulerSize(const QSize& size);
-    const QSize& getRulerSize() { return m_rulerSize; }
+    void setRulerSize(QSize size);
 
     // Unit: degrees
     // It will be clamped to [0, 90].
     // Initial value: 0
     void setRotation(qreal rotation);
+
+    const QSize& getRulerSize() { return m_rulerSize; }
 
     QSize getWindowSize() const { return m_windowSize; }
 

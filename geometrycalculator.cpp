@@ -8,8 +8,11 @@ GeometryCalculator::GeometryCalculator()
     _update();
 }
 
-void GeometryCalculator::setRulerSize(const QSize &size)
+void GeometryCalculator::setRulerSize(QSize size)
 {
+    if (size.width() < 100)
+        size.setWidth(100);
+
     if (m_rulerSize != size) {
         m_rulerSize = size;
         _update();
