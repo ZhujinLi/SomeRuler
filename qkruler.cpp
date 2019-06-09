@@ -34,9 +34,9 @@ static int _QPoint_length(const QPoint& p)
 
 QkRuler::QkRuler(QWidget *parent)
     : QWidget(parent,Qt::FramelessWindowHint | Qt::Tool),
-      m_draggingHandle(false),
       m_selectedTick(-1),
-      m_cursorInHandleArea(false)
+      m_cursorInHandleArea(false),
+      m_dragState(DragState_idle)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -250,7 +250,7 @@ void QkRuler::_about()
             dialog->size(),
             screen->geometry()
         )
-                );
+    );
 }
 
 void QkRuler::iconActivated(QSystemTrayIcon::ActivationReason reason)
@@ -268,8 +268,7 @@ void QkRuler::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
-        m_draggingHandle = _inHandleArea(event->localPos().toPoint());
-        m_hasDragged = false;
+        m_dragState = DragState_idle;
         event->accept();
     }
 }
@@ -283,27 +282,48 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
     }
 
     if (event->buttons() & Qt::LeftButton) {
-        if (event->globalPos() != m_dragPosition)
-            m_hasDragged = true;
+        if (event->localPos() != m_dragPosition) {
+            if (m_dragState == DragState_idle) {
+                if (!inHandleArea)
+                    m_dragState = DragState_moving;
+                else {
+                    QPoint diff = m_geoCalc.inversePos(event->localPos().toPoint()) -
+                            m_geoCalc.inversePos(m_dragPosition);
+                    if (qAbs(diff.x()) > qAbs(diff.y()))
+                        m_dragState = DragState_resizing;
+                    else if (qAbs(diff.x()) < qAbs(diff.y()))
+                        m_dragState = DragState_rotating;
+                }
+            }
+        }
 
-        if (m_draggingHandle) {
-            QSize rulerSize = m_geoCalc.getRulerSize();
-            QPoint origin = m_geoCalc.transformPos(QPoint{0, rulerSize.height() / 2});
-            QPoint delta = event->localPos().toPoint() - origin;
+        QSize rulerSize = m_geoCalc.getRulerSize();
+        QPoint origin = m_geoCalc.transformPos(QPoint{0, rulerSize.height() / 2});
+        QPoint delta = event->localPos().toPoint() - origin;
 
+        switch (m_dragState) {
+        case DragState_moving:
+            move(event->globalPos() - m_dragPosition);
+            break;
+        case DragState_resizing:
+        {
             int len = _QPoint_length(delta) + HANDLE_MARGIN;
             m_geoCalc.setRulerLength(len);
-
-            if (!QApplication::keyboardModifiers().testFlag(Qt::ShiftModifier)) {
-                qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
-                m_geoCalc.setRotation(angle);
-            }
-
             resize(m_geoCalc.getWindowSize());
             _updateMask();
+            break;
         }
-        else
-            move(event->globalPos() - m_dragPosition);
+        case DragState_rotating:
+        {
+            qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
+            m_geoCalc.setRotation(angle);
+            resize(m_geoCalc.getWindowSize());
+            _updateMask();
+            break;
+        }
+        default:
+            break;
+        }
 
         event->accept();
     }
@@ -314,17 +334,19 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         QPoint rawPos = m_geoCalc.inversePos(event->localPos().toPoint());
         bool inTickArea = rawPos.y() < 15 || rawPos.y() > m_geoCalc.getRulerSize().height() - 15;
-        if (m_hasDragged && !inTickArea) {
+        bool hasDragged = m_dragState != DragState_idle;
+        if (hasDragged && !inTickArea) {
             event->accept();
-        } else if (!m_hasDragged && inTickArea) {
+        } else if (!hasDragged && inTickArea) {
             m_selectedTick = rawPos.x();
             update();
             event->accept();
-        } else if (!m_hasDragged && !inTickArea) {
+        } else if (!hasDragged && !inTickArea) {
             m_selectedTick = -1;
             update();
             event->accept();
         }
+        m_dragState = DragState_idle;
     }
 }
 

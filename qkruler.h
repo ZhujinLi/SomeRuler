@@ -29,12 +29,19 @@ private:
     QBitmap _handleMask();
     bool _inHandleArea(QPoint pos);
 
+    enum DragState
+    {
+        DragState_idle,
+        DragState_moving,
+        DragState_rotating,
+        DragState_resizing
+    };
+
     GeometryCalculator m_geoCalc;
     QPoint m_dragPosition;
-    bool m_draggingHandle;
-    bool m_hasDragged;
     int m_selectedTick;
     bool m_cursorInHandleArea;
+    DragState m_dragState;
 
 private slots:
     void _reset();
