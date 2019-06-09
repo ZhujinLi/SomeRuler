@@ -3,6 +3,7 @@
 
 #include "geometrycalculator.h"
 
+#include <QSystemTrayIcon>
 #include <QWidget>
 
 class QkRuler : public QWidget
@@ -38,6 +39,7 @@ private:
 private slots:
     void _reset();
     void _about();
+    void iconActivated(QSystemTrayIcon::ActivationReason reason);
 };
 
 #endif // QKRULER_H

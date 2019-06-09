@@ -82,6 +82,8 @@ void QkRuler::_initTray()
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     trayIconMenu->addAction(quitAction);
 
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &QkRuler::iconActivated);
+
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 }
@@ -169,11 +171,11 @@ void QkRuler::paintEvent(QPaintEvent *)
     // Ticks
     for (int tick = 0; tick < w; tick++) {
         if (tick % 2 == 0) {
-            int len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5;
+            double len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5;
             bool isSelected = tick == (m_selectedTick | 1) - 1;
             painter.setPen(isSelected ? Qt::red : Qt::black);
-            painter.drawLine(tick, 0, tick, len);
-            painter.drawLine(tick, h,tick, h - len);
+            painter.drawLine(QPointF{tick+.5, 0}, QPointF{tick+.5, len});
+            painter.drawLine(QPointF{tick+.5, h+.0}, QPointF{tick+.5, h - len});
         }
     }
 
@@ -247,7 +249,18 @@ void QkRuler::_about()
             dialog->size(),
             screen->geometry()
         )
-    );
+                );
+}
+
+void QkRuler::iconActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::DoubleClick:
+        _appear();
+        break;
+    default:
+        ;
+    }
 }
 
 void QkRuler::mousePressEvent(QMouseEvent *event)
