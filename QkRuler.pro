@@ -43,3 +43,5 @@ RESOURCES += \
 
 FORMS += \
     about.ui
+
+RC_ICONS = images/app.ico
