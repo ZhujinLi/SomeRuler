@@ -33,7 +33,7 @@ static int _QPoint_length(const QPoint& p)
 }
 
 QkRuler::QkRuler(QWidget *parent)
-    : QWidget(parent, Qt::FramelessWindowHint),
+    : QWidget(parent,Qt::FramelessWindowHint | Qt::Tool),
       m_draggingHandle(false),
       m_selectedTick(-1),
       m_cursorInHandleArea(false)
@@ -158,13 +158,14 @@ void QkRuler::paintEvent(QPaintEvent *)
     painter.setFont(font);
 
     // Rect
-    QRect rulerRect = QRect{0, 0, w, h};
+    QRectF rulerRect = QRectF{.5, .5, w+.0, h+.0};
     if (!m_cursorInHandleArea) {
         painter.setClipping(true);
         painter.setClipRegion(_handleMask());
     }
     painter.setTransform(m_geoCalc.getTransform()); // After setting clipper
     painter.setBrush(QColor(0xff, 0xff, 0xff, 0xc0));
+    painter.setPen(Qt::black);
     painter.drawRect(rulerRect);
     painter.setClipping(false);
 
@@ -174,8 +175,8 @@ void QkRuler::paintEvent(QPaintEvent *)
             double len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5;
             bool isSelected = tick == (m_selectedTick | 1) - 1;
             painter.setPen(isSelected ? Qt::red : Qt::black);
-            painter.drawLine(QPointF{tick+.5, 0}, QPointF{tick+.5, len});
-            painter.drawLine(QPointF{tick+.5, h+.0}, QPointF{tick+.5, h - len});
+            painter.drawLine(QPointF{tick+.5, .5}, QPointF{tick+.5, .5+len});
+            painter.drawLine(QPointF{tick+.5, h+.5}, QPointF{tick+.5, h+.5-len});
         }
     }
 
@@ -185,11 +186,11 @@ void QkRuler::paintEvent(QPaintEvent *)
         if (tick % 100 == 0) {
             QString label = QString::number(tick * devicePixelRatio());
 
-            QRect upperRect(tick, 15, 100, 100);
+            QRectF upperRect(tick+1.5, 15, 100, 100);
             upperRect &= rulerRect;
             painter.drawText(upperRect, Qt::AlignLeft | Qt::AlignTop, label);
 
-            QRect lowerRect(tick, h - 15 - 100, 100, 100);
+            QRectF lowerRect(tick+1.5, h+.5-15-100, 100, 100);
             lowerRect &= rulerRect;
             painter.drawText(lowerRect, Qt::AlignLeft | Qt::AlignBottom, label);
         }
