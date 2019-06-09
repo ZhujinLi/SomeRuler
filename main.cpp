@@ -1,17 +1,12 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#include "qkruler.h"
+#include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    // Note that Qt::AA_DisableHighDpiScaling does not always work
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+    QApplication a(argc, argv);
+    QkRuler w;
+    w.show();
 
-    QGuiApplication app(argc, argv);
-
-    QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-    if (engine.rootObjects().isEmpty())
-        return -1;
-
-    return app.exec();
+    return a.exec();
 }

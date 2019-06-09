@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
         <file>images/qkruler-icon.png</file>
+        <file>images/app.ico</file>
     </qresource>
 </RCC>
