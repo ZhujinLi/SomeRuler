@@ -237,6 +237,10 @@ void QkRuler::_reset()
     m_geoCalc.setRotation(0);
     resize(m_geoCalc.getWindowSize());
     _updateMask();
+
+    m_selectedTick = -1;
+    m_handleHighlighted = false;
+    update();
 }
 
 void QkRuler::_about()
