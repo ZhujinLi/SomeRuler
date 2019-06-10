@@ -33,7 +33,7 @@ static int _QPoint_length(const QPoint& p)
 }
 
 QkRuler::QkRuler(QWidget *parent)
-    : QWidget(parent,Qt::FramelessWindowHint | Qt::Tool),
+    : QWidget(parent,Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint),
       m_selectedTick(-1),
       m_handleHighlighted(false),
       m_dragState(DragState_idle)
