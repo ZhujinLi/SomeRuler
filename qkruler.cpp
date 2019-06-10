@@ -45,6 +45,8 @@ QkRuler::QkRuler(QWidget *parent)
     _reset();
 
     setMouseTracking(true);
+
+    _appear();
 }
 
 QkRuler::~QkRuler()
