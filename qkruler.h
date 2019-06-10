@@ -28,6 +28,7 @@ private:
     QPoint _handlePos();
     QBitmap _handleMask();
     bool _inHandleArea(QPoint pos);
+    void _highlightHandle(bool in);
 
     enum DragState
     {
@@ -40,7 +41,7 @@ private:
     GeometryCalculator m_geoCalc;
     QPoint m_dragPosition;
     int m_selectedTick;
-    bool m_cursorInHandleArea;
+    bool m_handleHighlighted;
     DragState m_dragState;
 
 private slots:

@@ -35,7 +35,7 @@ static int _QPoint_length(const QPoint& p)
 QkRuler::QkRuler(QWidget *parent)
     : QWidget(parent,Qt::FramelessWindowHint | Qt::Tool),
       m_selectedTick(-1),
-      m_cursorInHandleArea(false),
+      m_handleHighlighted(false),
       m_dragState(DragState_idle)
 {
     setAttribute(Qt::WA_TranslucentBackground);
@@ -161,7 +161,7 @@ void QkRuler::paintEvent(QPaintEvent *)
 
     // Rect
     QRectF rulerRect = QRectF{.5, .5, w+.0, h+.0};
-    if (!m_cursorInHandleArea) {
+    if (!m_handleHighlighted) {
         painter.setClipping(true);
         painter.setClipRegion(_handleMask());
     }
@@ -209,7 +209,7 @@ void QkRuler::paintEvent(QPaintEvent *)
     QPoint handleCenter = _handlePos();
     QPen pen;
     pen.setWidth(2);
-    pen.setBrush(m_cursorInHandleArea ? Qt::red : Qt::black);
+    pen.setBrush(m_handleHighlighted ? Qt::red : Qt::black);
     painter.setPen(pen);
     painter.setBrush(Qt::NoBrush);
     painter.drawEllipse(handleCenter, HANDLE_RADIUS, HANDLE_RADIUS);
@@ -221,6 +221,14 @@ bool QkRuler::_inHandleArea(QPoint pos)
     QRect handleArea(handlePos.x() - HANDLE_RADIUS * 2,
                          handlePos.y() - HANDLE_RADIUS * 2, HANDLE_RADIUS * 4, HANDLE_RADIUS * 4);
     return handleArea.contains(pos);
+}
+
+void QkRuler::_highlightHandle(bool in)
+{
+    if (in != m_handleHighlighted) {
+        m_handleHighlighted = in;
+        update();
+    }
 }
 
 void QkRuler::_reset()
@@ -270,6 +278,7 @@ void QkRuler::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+        _highlightHandle(_inHandleArea(event->localPos().toPoint()));
         m_dragState = DragState_idle;
         event->accept();
     }
@@ -277,23 +286,17 @@ void QkRuler::mousePressEvent(QMouseEvent *event)
 
 void QkRuler::mouseMoveEvent(QMouseEvent *event)
 {
-    bool inHandleArea = _inHandleArea(event->localPos().toPoint());
-    if (m_cursorInHandleArea != inHandleArea) {
-        m_cursorInHandleArea = inHandleArea;
-        update();
-    }
-
     if (event->buttons() & Qt::LeftButton) {
         if (event->localPos() != m_dragPosition) {
             if (m_dragState == DragState_idle) {
-                if (!inHandleArea)
+                if (!m_handleHighlighted)
                     m_dragState = DragState_moving;
                 else {
                     QPoint diff = m_geoCalc.inversePos(event->localPos().toPoint()) -
                             m_geoCalc.inversePos(m_dragPosition);
-                    if (qAbs(diff.x()) > qAbs(diff.y()))
+                    if (qAbs(diff.x()) > qAbs(diff.y()) + 5)
                         m_dragState = DragState_resizing;
-                    else if (qAbs(diff.x()) < qAbs(diff.y()))
+                    else if (qAbs(diff.x()) < qAbs(diff.y()) - 5)
                         m_dragState = DragState_rotating;
                 }
             }
@@ -328,7 +331,10 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
         }
 
         event->accept();
+    } else {
+        _highlightHandle(_inHandleArea(event->localPos().toPoint()));
     }
+
 }
 
 void QkRuler::mouseReleaseEvent(QMouseEvent *event)
@@ -349,6 +355,7 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
             event->accept();
         }
         m_dragState = DragState_idle;
+        _highlightHandle(_inHandleArea(event->localPos().toPoint()));
     }
 }
 
