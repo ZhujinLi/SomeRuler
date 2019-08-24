@@ -64,7 +64,7 @@ void QkRuler::_appear()
 void QkRuler::_initTray()
 {
     QSystemTrayIcon* trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(":/images/qkruler-icon.png"));
+    trayIcon->setIcon(QIcon(":/images/app.png"));
 
     QMenu* trayIconMenu = new QMenu(this);
 

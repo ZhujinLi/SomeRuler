@@ -45,3 +45,5 @@ FORMS += \
     about.ui
 
 RC_ICONS = images/app.ico
+
+ICON = images/app.icns
