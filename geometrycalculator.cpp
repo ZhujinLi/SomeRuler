@@ -28,7 +28,7 @@ void GeometryCalculator::setRotation(qreal rotation)
     rotation = qMax(rotation, 0.0);
     rotation = qMin(rotation, 90.0);
 
-    if (!qFuzzyCompare(rotation, m_rotation)) {
+    if (rotation != m_rotation) {
         m_rotation = rotation;
         _update();
     }
