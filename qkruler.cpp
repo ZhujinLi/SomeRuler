@@ -233,7 +233,7 @@ void QkRuler::_updateWindowGeometry()
 {
     QSize newSize = m_geoCalc.getWindowSize();
 
-    if (m_geoCalc.getRotation() < 0) {
+    if (m_geoCalc.getRotationMode() == RotationMode_up) {
         QPoint oldTopLeft = frameGeometry().topLeft();
         QSize oldSize = frameGeometry().size();
         QPoint newTopLeft(oldTopLeft.x(), oldTopLeft.y() + oldSize.height() - newSize.height());
@@ -358,19 +358,30 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
         QPoint rawPos = m_geoCalc.inversePos(event->localPos().toPoint());
         bool inTickArea = rawPos.y() < 15 || rawPos.y() > m_geoCalc.getRulerSize().height() - 15;
         bool hasDragged = m_dragState > DragState_recognizing;
-        if (hasDragged && !inTickArea) {
+
+        if (m_dragState == DragState_rotating) {
+            if (m_geoCalc.getRotation() < 0)
+                m_geoCalc.setRotationMode(RotationMode_up);
+            else if (m_geoCalc.getRotation() > 0)
+                m_geoCalc.setRotationMode(RotationMode_down);
+            else
+                m_geoCalc.setRotationMode(RotationMode_both);
+            event->accept();
+        }
+        else if (hasDragged && !inTickArea) {
             event->accept();
         } else if (!hasDragged && inTickArea) {
             if (m_dragState == DragState_recognizing) {
                 m_selectedTick = rawPos.x();
                 update();
-                event->accept();
             }
+            event->accept();
         } else if (!hasDragged && !inTickArea) {
             m_selectedTick = -1;
             update();
             event->accept();
         }
+
         m_dragState = DragState_idle;
         _highlightHandle(_inHandleArea(event->localPos().toPoint()));
     }
