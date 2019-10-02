@@ -44,11 +44,12 @@ QkRuler::QkRuler(QWidget *parent)
 
     _initTray();
 
-    _reset();
-
     setMouseTracking(true);
 
     _appear();
+
+    _reset();
+
 }
 
 QkRuler::~QkRuler()
@@ -251,6 +252,16 @@ void QkRuler::_reset()
     m_geoCalc.setRotation(0);
     _updateWindowGeometry();
 
+    QScreen* screen = window()->windowHandle()->screen();
+    setGeometry(
+        QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            size(),
+            screen->geometry()
+        )
+    );
+
     m_selectedTick = -1;
     m_handleHighlighted = false;
     update();
@@ -390,8 +401,8 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
 void QkRuler::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (_inHandleArea(event->localPos().toPoint())) {
-        m_geoCalc.setRotation(0);
-        _updateWindowGeometry();
+        _reset();
+
         m_dragState = DragState_idle;
 
         event->accept();
