@@ -16,6 +16,8 @@ public:
     // Initial value: 0
     void setRotation(qreal rotation);
 
+    qreal getRotation() { return m_rotation; }
+
     // Initial value: 0
     void setPaddings(int paddings) { m_paddings = paddings; }
 

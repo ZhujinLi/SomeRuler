@@ -231,7 +231,17 @@ void QkRuler::_highlightHandle(bool in)
 
 void QkRuler::_updateWindowGeometry()
 {
-    resize(m_geoCalc.getWindowSize());
+    QSize newSize = m_geoCalc.getWindowSize();
+
+    if (m_geoCalc.getRotation() < 0) {
+        QPoint oldTopLeft = frameGeometry().topLeft();
+        QSize oldSize = frameGeometry().size();
+        QPoint newTopLeft(oldTopLeft.x(), oldTopLeft.y() + oldSize.height() - newSize.height());
+        move(newTopLeft);
+    }
+
+    resize(newSize);
+
     _updateMask();
 }
 

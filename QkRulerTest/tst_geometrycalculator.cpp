@@ -28,7 +28,7 @@ private slots:
         QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{100, 1000}));
 
         o.setRotation(-45);
-        QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{808, 778}));
+        QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{int(100+1000/1.414+100/1.414), int(1000/1.414+100)}));
     }
 
     void test_case_transform()
