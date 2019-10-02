@@ -72,10 +72,6 @@ void QkRuler::_initTray()
     connect(showAction, &QAction::triggered, this, &QkRuler::_appear);
     trayIconMenu->addAction(showAction);
 
-    QAction* resetAction = new QAction(tr("&Reset"), this);
-    connect(resetAction, &QAction::triggered, this, &QkRuler::_reset);
-    trayIconMenu->addAction(resetAction);
-
     QAction* aboutAction = new QAction(tr("&About..."), this);
     connect(aboutAction, &QAction::triggered, this, &QkRuler::_about);
     trayIconMenu->addAction(aboutAction);
@@ -231,12 +227,17 @@ void QkRuler::_highlightHandle(bool in)
     }
 }
 
+void QkRuler::_updateWindowGeometry()
+{
+    resize(m_geoCalc.getWindowSize());
+    _updateMask();
+}
+
 void QkRuler::_reset()
 {
     m_geoCalc.setRulerLength(600);
     m_geoCalc.setRotation(0);
-    resize(m_geoCalc.getWindowSize());
-    _updateMask();
+    _updateWindowGeometry();
 
     m_selectedTick = -1;
     m_handleHighlighted = false;
@@ -283,7 +284,7 @@ void QkRuler::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
         _highlightHandle(_inHandleArea(event->localPos().toPoint()));
-        m_dragState = DragState_idle;
+        m_dragState = DragState_recognizing;
         event->accept();
     }
 }
@@ -292,7 +293,7 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if (event->localPos() != m_dragPosition) {
-            if (m_dragState == DragState_idle) {
+            if (m_dragState == DragState_recognizing) {
                 if (!m_handleHighlighted)
                     m_dragState = DragState_moving;
                 else {
@@ -318,16 +319,14 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
         {
             int len = _QPoint_length(delta) + HANDLE_MARGIN;
             m_geoCalc.setRulerLength(len);
-            resize(m_geoCalc.getWindowSize());
-            _updateMask();
+            _updateWindowGeometry();
             break;
         }
         case DragState_rotating:
         {
             qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
             m_geoCalc.setRotation(angle);
-            resize(m_geoCalc.getWindowSize());
-            _updateMask();
+            _updateWindowGeometry();
             break;
         }
         default:
@@ -346,13 +345,15 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         QPoint rawPos = m_geoCalc.inversePos(event->localPos().toPoint());
         bool inTickArea = rawPos.y() < 15 || rawPos.y() > m_geoCalc.getRulerSize().height() - 15;
-        bool hasDragged = m_dragState != DragState_idle;
+        bool hasDragged = m_dragState > DragState_recognizing;
         if (hasDragged && !inTickArea) {
             event->accept();
         } else if (!hasDragged && inTickArea) {
-            m_selectedTick = rawPos.x();
-            update();
-            event->accept();
+            if (m_dragState == DragState_recognizing) {
+                m_selectedTick = rawPos.x();
+                update();
+                event->accept();
+            }
         } else if (!hasDragged && !inTickArea) {
             m_selectedTick = -1;
             update();
@@ -363,3 +364,13 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+void QkRuler::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (_inHandleArea(event->localPos().toPoint())) {
+        m_geoCalc.setRotation(0);
+        _updateWindowGeometry();
+        m_dragState = DragState_idle;
+
+        event->accept();
+    }
+}

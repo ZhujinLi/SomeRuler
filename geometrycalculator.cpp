@@ -25,7 +25,7 @@ void GeometryCalculator::setRulerLength(int len)
 
 void GeometryCalculator::setRotation(qreal rotation)
 {
-    rotation = qMax(rotation, 0.0);
+    rotation = qMax(rotation, -90.0);
     rotation = qMin(rotation, 90.0);
 
     if (rotation != m_rotation) {
@@ -50,7 +50,7 @@ void GeometryCalculator::_update()
     int h = m_rulerSize.height();
     qreal rotationInRadius = qDegreesToRadians(m_rotation);
     qreal winW = h + w * cos(rotationInRadius);
-    qreal winH = w * sin(rotationInRadius) + h * cos(rotationInRadius);
+    qreal winH = w * abs(sin(rotationInRadius)) + h * cos(rotationInRadius);
     m_windowSize = {static_cast<int>(winW + 2 * PADDINGS), static_cast<int>(winH + 2 * PADDINGS)};
 
     m_transform = QTransform()
