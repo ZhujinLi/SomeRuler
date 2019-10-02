@@ -390,8 +390,8 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
 void QkRuler::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (_inHandleArea(event->localPos().toPoint())) {
-        m_geoCalc.setRotation(0);
-        _updateWindowGeometry();
+        _reset();
+
         m_dragState = DragState_idle;
 
         event->accept();
