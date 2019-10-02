@@ -1,13 +1,13 @@
 #include <QtTest>
 #include "../geometrycalculator.h"
 
-static const int TOLERANCE = 20;
+static const int TOLERANCE = 2;
 
 static bool _QSize_fuzzyCompare(const QSize& a, const QSize& b)
 {
     int diffX = qAbs(a.width() - b.width());
     int diffY = qAbs(a.height() - b.height());
-    return diffX < TOLERANCE && diffY < TOLERANCE;
+    return diffX <= TOLERANCE && diffY <= TOLERANCE;
 }
 
 class TstGeometryCalculator : public QObject
@@ -26,6 +26,9 @@ private slots:
 
         o.setRotation(90);
         QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{100, 1000}));
+
+        o.setRotation(-45);
+        QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{808, 778}));
     }
 
     void test_case_transform()
@@ -35,6 +38,9 @@ private slots:
         QCOMPARE(o.inversePos(o.transformPos(QPoint{0, 0})), (QPoint{0, 0}));
 
         o.setRotation(90);
+        QCOMPARE(o.inversePos(o.transformPos(QPoint{500, 50})), (QPoint{500, 50}));
+
+        o.setRotation(-90);
         QCOMPARE(o.inversePos(o.transformPos(QPoint{500, 50})), (QPoint{500, 50}));
     }
 };

@@ -40,6 +40,8 @@ QkRuler::QkRuler(QWidget *parent)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
+    m_geoCalc.setPaddings(5);	// For anti-aliasing
+
     _initTray();
 
     _reset();

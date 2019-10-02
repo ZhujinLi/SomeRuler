@@ -1,9 +1,6 @@
 #include "geometrycalculator.h"
 #include <QtMath>
 
-// For AA
-static const int PADDINGS = 5;
-
 GeometryCalculator::GeometryCalculator()
 {
     m_rotation = 0;
@@ -51,10 +48,10 @@ void GeometryCalculator::_update()
     qreal rotationInRadius = qDegreesToRadians(m_rotation);
     qreal winW = h + w * cos(rotationInRadius);
     qreal winH = w * abs(sin(rotationInRadius)) + h * cos(rotationInRadius);
-    m_windowSize = {static_cast<int>(winW + 2 * PADDINGS), static_cast<int>(winH + 2 * PADDINGS)};
+    m_windowSize = {static_cast<int>(winW + 2 * m_paddings), static_cast<int>(winH + 2 * m_paddings)};
 
     m_transform = QTransform()
-            .translate(PADDINGS, PADDINGS)
+            .translate(m_paddings, m_paddings)
             .translate(m_rulerSize.height(), 0)
             .rotate(m_rotation);
 

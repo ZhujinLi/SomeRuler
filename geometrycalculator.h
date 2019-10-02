@@ -16,6 +16,9 @@ public:
     // Initial value: 0
     void setRotation(qreal rotation);
 
+    // Initial value: 0
+    void setPaddings(int paddings) { m_paddings = paddings; }
+
     const QSize& getRulerSize() { return m_rulerSize; }
 
     QSize getWindowSize() const { return m_windowSize; }
@@ -33,6 +36,7 @@ private:
     QSize m_windowSize;
     QTransform m_transform;
     QTransform m_invTransform;
+    int m_paddings;
 };
 
 #endif // GEOMETRYCALCULATOR_H
