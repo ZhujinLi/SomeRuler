@@ -20,19 +20,21 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
     void _appear();
     void _initTray();
-    void _updateMask();
     QPoint _handlePos();
     QBitmap _handleMask();
     bool _inHandleArea(QPoint pos);
     void _highlightHandle(bool in);
+    void _updateWindowGeometry();
 
     enum DragState
     {
         DragState_idle,
+        DragState_recognizing,
         DragState_moving,
         DragState_rotating,
         DragState_resizing

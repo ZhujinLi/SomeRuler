@@ -40,13 +40,16 @@ QkRuler::QkRuler(QWidget *parent)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
-    _initTray();
+    m_geoCalc.setPaddings(5);	// For anti-aliasing
 
-    _reset();
+    _initTray();
 
     setMouseTracking(true);
 
     _appear();
+
+    _reset();
+
 }
 
 QkRuler::~QkRuler()
@@ -72,10 +75,6 @@ void QkRuler::_initTray()
     connect(showAction, &QAction::triggered, this, &QkRuler::_appear);
     trayIconMenu->addAction(showAction);
 
-    QAction* resetAction = new QAction(tr("&Reset"), this);
-    connect(resetAction, &QAction::triggered, this, &QkRuler::_reset);
-    trayIconMenu->addAction(resetAction);
-
     QAction* aboutAction = new QAction(tr("&About..."), this);
     connect(aboutAction, &QAction::triggered, this, &QkRuler::_about);
     trayIconMenu->addAction(aboutAction);
@@ -100,24 +99,6 @@ void QkRuler::keyReleaseEvent(QKeyEvent *event)
     default:
         break;
     }
-}
-
-
-void QkRuler::_updateMask()
-{
-    QBitmap mask(m_geoCalc.getWindowSize());
-    mask.clear();
-
-    QPainter painter(&mask);
-    painter.setTransform(m_geoCalc.getTransform());
-
-    // Ruler rect
-    painter.setBrush(Qt::color1);
-    QRect rect(0, 0, m_geoCalc.getRulerSize().width(), m_geoCalc.getRulerSize().height());
-    rect = rect.marginsAdded(QMargins(1, 1, 1, 1)); // Expand for AA
-    painter.drawRect(rect);
-
-    setMask(mask);
 }
 
 QBitmap QkRuler::_handleMask()
@@ -231,12 +212,38 @@ void QkRuler::_highlightHandle(bool in)
     }
 }
 
+void QkRuler::_updateWindowGeometry()
+{
+    QSize newSize = m_geoCalc.getWindowSize();
+
+    QPoint newTopLeft;
+    if (m_geoCalc.getRotationMode() == RotationMode_up) {
+        QPoint oldTopLeft = frameGeometry().topLeft();
+        QSize oldSize = frameGeometry().size();
+        newTopLeft = QPoint(oldTopLeft.x(), oldTopLeft.y() + oldSize.height() - newSize.height());
+    } else {
+        newTopLeft = geometry().topLeft();
+    }
+
+    QRect newGeometry(newTopLeft, newSize);
+    setGeometry(newGeometry);
+}
+
 void QkRuler::_reset()
 {
     m_geoCalc.setRulerLength(600);
     m_geoCalc.setRotation(0);
-    resize(m_geoCalc.getWindowSize());
-    _updateMask();
+    _updateWindowGeometry();
+
+    QScreen* screen = window()->windowHandle()->screen();
+    setGeometry(
+        QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            size(),
+            screen->geometry()
+        )
+    );
 
     m_selectedTick = -1;
     m_handleHighlighted = false;
@@ -283,7 +290,7 @@ void QkRuler::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
         _highlightHandle(_inHandleArea(event->localPos().toPoint()));
-        m_dragState = DragState_idle;
+        m_dragState = DragState_recognizing;
         event->accept();
     }
 }
@@ -292,7 +299,7 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if (event->localPos() != m_dragPosition) {
-            if (m_dragState == DragState_idle) {
+            if (m_dragState == DragState_recognizing) {
                 if (!m_handleHighlighted)
                     m_dragState = DragState_moving;
                 else {
@@ -307,8 +314,8 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
         }
 
         QSize rulerSize = m_geoCalc.getRulerSize();
-        QPoint origin = m_geoCalc.transformPos(QPoint{0, rulerSize.height() / 2});
-        QPoint delta = event->localPos().toPoint() - origin;
+        QPoint origin = m_geoCalc.transformPos(QPoint{0, rulerSize.height() / 2}) + geometry().topLeft();
+        QPoint delta = event->globalPos() - origin;
 
         switch (m_dragState) {
         case DragState_moving:
@@ -318,16 +325,14 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
         {
             int len = _QPoint_length(delta) + HANDLE_MARGIN;
             m_geoCalc.setRulerLength(len);
-            resize(m_geoCalc.getWindowSize());
-            _updateMask();
+            _updateWindowGeometry();
             break;
         }
         case DragState_rotating:
         {
             qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
             m_geoCalc.setRotation(angle);
-            resize(m_geoCalc.getWindowSize());
-            _updateMask();
+            _updateWindowGeometry();
             break;
         }
         default:
@@ -346,20 +351,43 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         QPoint rawPos = m_geoCalc.inversePos(event->localPos().toPoint());
         bool inTickArea = rawPos.y() < 15 || rawPos.y() > m_geoCalc.getRulerSize().height() - 15;
-        bool hasDragged = m_dragState != DragState_idle;
-        if (hasDragged && !inTickArea) {
+        bool hasDragged = m_dragState > DragState_recognizing;
+
+        if (m_dragState == DragState_rotating) {
+            if (m_geoCalc.getRotation() < 0)
+                m_geoCalc.setRotationMode(RotationMode_up);
+            else if (m_geoCalc.getRotation() > 0)
+                m_geoCalc.setRotationMode(RotationMode_down);
+            else
+                m_geoCalc.setRotationMode(RotationMode_both);
+            event->accept();
+        }
+        else if (hasDragged && !inTickArea) {
             event->accept();
         } else if (!hasDragged && inTickArea) {
-            m_selectedTick = rawPos.x();
-            update();
+            if (m_dragState == DragState_recognizing) {
+                m_selectedTick = rawPos.x();
+                update();
+            }
             event->accept();
         } else if (!hasDragged && !inTickArea) {
             m_selectedTick = -1;
             update();
             event->accept();
         }
+
         m_dragState = DragState_idle;
         _highlightHandle(_inHandleArea(event->localPos().toPoint()));
     }
 }
 
+void QkRuler::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if (_inHandleArea(event->localPos().toPoint())) {
+        _reset();
+
+        m_dragState = DragState_idle;
+
+        event->accept();
+    }
+}
