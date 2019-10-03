@@ -314,8 +314,8 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
         }
 
         QSize rulerSize = m_geoCalc.getRulerSize();
-        QPoint origin = m_geoCalc.transformPos(QPoint{0, rulerSize.height() / 2});
-        QPoint delta = event->localPos().toPoint() - origin;
+        QPoint origin = m_geoCalc.transformPos(QPoint{0, rulerSize.height() / 2}) + geometry().topLeft();
+        QPoint delta = event->globalPos() - origin;
 
         switch (m_dragState) {
         case DragState_moving:
