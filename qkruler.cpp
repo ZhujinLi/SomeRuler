@@ -216,14 +216,17 @@ void QkRuler::_updateWindowGeometry()
 {
     QSize newSize = m_geoCalc.getWindowSize();
 
+    QPoint newTopLeft;
     if (m_geoCalc.getRotationMode() == RotationMode_up) {
         QPoint oldTopLeft = frameGeometry().topLeft();
         QSize oldSize = frameGeometry().size();
-        QPoint newTopLeft(oldTopLeft.x(), oldTopLeft.y() + oldSize.height() - newSize.height());
-        move(newTopLeft);
+        newTopLeft = QPoint(oldTopLeft.x(), oldTopLeft.y() + oldSize.height() - newSize.height());
+    } else {
+        newTopLeft = geometry().topLeft();
     }
 
-    resize(newSize);
+    QRect newGeometry(newTopLeft, newSize);
+    setGeometry(newGeometry);
 }
 
 void QkRuler::_reset()
