@@ -44,11 +44,12 @@ QkRuler::QkRuler(QWidget *parent)
 
     _initTray();
 
-    _reset();
-
     setMouseTracking(true);
 
     _appear();
+
+    _reset();
+
 }
 
 QkRuler::~QkRuler()
@@ -250,6 +251,16 @@ void QkRuler::_reset()
     m_geoCalc.setRulerLength(600);
     m_geoCalc.setRotation(0);
     _updateWindowGeometry();
+
+    QScreen* screen = window()->windowHandle()->screen();
+    setGeometry(
+        QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            size(),
+            screen->geometry()
+        )
+    );
 
     m_selectedTick = -1;
     m_handleHighlighted = false;
