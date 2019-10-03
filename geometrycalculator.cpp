@@ -6,6 +6,7 @@ GeometryCalculator::GeometryCalculator()
     m_rotation = 0;
     m_rotationMode = RotationMode_both;
     m_rulerSize = QSize(100, 100);
+    m_paddings = 0;
     _update();
 }
 
