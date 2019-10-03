@@ -25,7 +25,6 @@ protected:
 private:
     void _appear();
     void _initTray();
-    void _updateMask();
     QPoint _handlePos();
     QBitmap _handleMask();
     bool _inHandleArea(QPoint pos);
