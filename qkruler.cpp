@@ -26,10 +26,10 @@ static const int HANDLE_MARGIN = 20;
 
 static int _QPoint_length(const QPoint& p)
 {
-    double x = p.x();
-    double y = p.y();
-    double len = sqrt(x*x + y*y);
-    return static_cast<int>(len + 0.5);
+    int x = p.x();
+    int y = p.y();
+    float len = sqrt(static_cast<float>(x*x + y*y));
+    return static_cast<int>(len + 0.5f);
 }
 
 QkRuler::QkRuler(QWidget *parent)
@@ -181,9 +181,8 @@ void QkRuler::paintEvent(QPaintEvent *)
 
     // Info
     painter.setPen(m_selectedTick >= 0 ? Qt::red : Qt::black);
-    int num2Show = (m_selectedTick >= 0 ? m_selectedTick : w) * devicePixelRatio();
     QRect infoRect(15, 0, 100, h);
-    QString infoText = QString::number(num2Show) + " px";
+    QString infoText = _makeInfoText();
     painter.drawText(infoRect, Qt::AlignLeft | Qt::AlignVCenter, infoText);
 
     // Handle
@@ -227,6 +226,19 @@ void QkRuler::_updateWindowGeometry()
 
     QRect newGeometry(newTopLeft, newSize);
     setGeometry(newGeometry);
+}
+
+QString QkRuler::_makeInfoText()
+{
+    QSize rulerSize = m_geoCalc.getRulerSize();
+    int w = rulerSize.width();
+    int num2Show = (m_selectedTick >= 0 ? m_selectedTick : w) * devicePixelRatio();
+    QString text = QString::number(num2Show) + " px";
+    qreal rotation = abs(m_geoCalc.getRotation());
+    if (rotation != 90 && rotation != 0) {
+        text += ", " + QString::number(rotation, 'f', 1) + "°";
+    }
+    return text;
 }
 
 void QkRuler::_reset()

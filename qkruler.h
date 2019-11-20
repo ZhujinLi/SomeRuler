@@ -30,6 +30,7 @@ private:
     bool _inHandleArea(QPoint pos);
     void _highlightHandle(bool in);
     void _updateWindowGeometry();
+    QString _makeInfoText();
 
     enum DragState
     {
