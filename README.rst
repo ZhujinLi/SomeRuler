@@ -10,6 +10,7 @@ Features & usage:
 
 * Cross platform (tested under Windows 10 and Mac OS X)
 * High DPI support
+* Can server as a protractor
 * Resize: drag the circle handle horizontally
 * Rotation: drag the circle handle upward or downward
 * Reading: click on the tick to read the value
