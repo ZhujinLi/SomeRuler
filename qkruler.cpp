@@ -23,6 +23,8 @@ class About;
 
 static const int HANDLE_RADIUS = 4;
 static const int HANDLE_MARGIN = 20;
+static const int HANDLE_DETECT_RADIUS = HANDLE_RADIUS * 2;
+static const int HANDLE_MOVE_THRESHOLD = HANDLE_DETECT_RADIUS + 1;
 
 static int _QPoint_length(const QPoint& p)
 {
@@ -215,8 +217,8 @@ void QkRuler::paintEvent(QPaintEvent *)
 bool QkRuler::_inHandleArea(QPoint pos)
 {
     QPoint handlePos = m_geoCalc.transformPos(_handlePos());
-    QRect handleArea(handlePos.x() - HANDLE_RADIUS * 2,
-                         handlePos.y() - HANDLE_RADIUS * 2, HANDLE_RADIUS * 4, HANDLE_RADIUS * 4);
+    QRect handleArea(handlePos.x() - HANDLE_DETECT_RADIUS,
+                         handlePos.y() - HANDLE_DETECT_RADIUS, HANDLE_DETECT_RADIUS * 2, HANDLE_DETECT_RADIUS * 2);
     return handleArea.contains(pos);
 }
 
@@ -336,9 +338,9 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
                 else {
                     QPoint diff = m_geoCalc.inversePos(event->localPos().toPoint()) -
                             m_geoCalc.inversePos(m_dragPosition);
-                    if (qAbs(diff.x()) > qAbs(diff.y()) + 5)
+                    if (qAbs(diff.x()) > qAbs(diff.y()) + HANDLE_MOVE_THRESHOLD)
                         m_dragState = DragState_resizing;
-                    else if (qAbs(diff.x()) < qAbs(diff.y()) - 5)
+                    else if (qAbs(diff.x()) < qAbs(diff.y()) - HANDLE_MOVE_THRESHOLD)
                         m_dragState = DragState_rotating;
                 }
             }
@@ -369,12 +371,11 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
         default:
             break;
         }
-
-        event->accept();
     } else {
         _highlightHandle(_inHandleArea(event->localPos().toPoint()));
     }
 
+    event->accept();
 }
 
 void QkRuler::mouseReleaseEvent(QMouseEvent *event)
