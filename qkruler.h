@@ -27,6 +27,7 @@ private:
     void _initTray();
     QPoint _handlePos();
     QBitmap _handleMask();
+    void _updateMask();
     bool _inHandleArea(QPoint pos);
     void _highlightHandle(bool in);
     void _updateWindowGeometry();

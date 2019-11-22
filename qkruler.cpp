@@ -101,6 +101,23 @@ void QkRuler::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+void QkRuler::_updateMask()
+{
+    QBitmap mask(m_geoCalc.getWindowSize());
+    mask.clear();
+
+    QPainter painter(&mask);
+    painter.setTransform(m_geoCalc.getTransform());
+
+    // Ruler rect
+    painter.setBrush(Qt::color1);
+    QRect rect(0, 0, m_geoCalc.getRulerSize().width(), m_geoCalc.getRulerSize().height());
+    rect = rect.marginsAdded(QMargins(1, 1, 1, 1)); // Expand for AA
+    painter.drawRect(rect);
+
+    setMask(mask);
+}
+
 QBitmap QkRuler::_handleMask()
 {
     QBitmap mask(m_geoCalc.getWindowSize());
@@ -226,6 +243,8 @@ void QkRuler::_updateWindowGeometry()
 
     QRect newGeometry(newTopLeft, newSize);
     setGeometry(newGeometry);
+
+    _updateMask();
 }
 
 QString QkRuler::_makeInfoText()
