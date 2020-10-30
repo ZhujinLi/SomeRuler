@@ -43,11 +43,6 @@ void GeometryCalculator::setRotation(qreal rotation)
     if (rotation != m_rotation) {
         m_rotation = rotation;
         _update();
-
-        if (m_rotationMode == RotationMode_both && m_rotation < 0)
-            m_rotationMode = RotationMode_up;
-        else if (m_rotationMode == RotationMode_both && m_rotation > 0)
-            m_rotationMode  = RotationMode_down;
     }
 }
 

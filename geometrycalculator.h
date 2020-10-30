@@ -22,7 +22,7 @@ public:
     RotationMode getRotationMode() { return m_rotationMode; }
 
     // Unit: degrees
-    // It will be clamped to [0, 90].
+    // It will be clamped according to current rotation mode.
     // Initial value: 0
     void setRotation(qreal rotation);
 

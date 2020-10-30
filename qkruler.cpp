@@ -265,6 +265,7 @@ QString QkRuler::_makeInfoText()
 void QkRuler::_reset()
 {
     m_geoCalc.setRulerLength(600);
+    m_geoCalc.setRotationMode(RotationMode_both);
     m_geoCalc.setRotation(0);
     _updateWindowGeometry();
 
@@ -340,8 +341,13 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
                             m_geoCalc.inversePos(m_dragPosition);
                     if (qAbs(diff.x()) > qAbs(diff.y()) + HANDLE_MOVE_THRESHOLD)
                         m_dragState = DragState_resizing;
-                    else if (qAbs(diff.x()) < qAbs(diff.y()) - HANDLE_MOVE_THRESHOLD)
+                    else if (qAbs(diff.x()) < qAbs(diff.y()) - HANDLE_MOVE_THRESHOLD) {
                         m_dragState = DragState_rotating;
+                        if (m_geoCalc.getRotationMode() == RotationMode_both) {
+                            m_geoCalc.setRotationMode(diff.y() > 0 ? RotationMode_down
+                                                                   : RotationMode_up);
+                        }
+                    }
                 }
             }
         }
@@ -386,15 +392,10 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
         bool hasDragged = m_dragState > DragState_recognizing;
 
         if (m_dragState == DragState_rotating) {
-            if (m_geoCalc.getRotation() < 0)
-                m_geoCalc.setRotationMode(RotationMode_up);
-            else if (m_geoCalc.getRotation() > 0)
-                m_geoCalc.setRotationMode(RotationMode_down);
-            else
+            if (m_geoCalc.getRotation() == 0)
                 m_geoCalc.setRotationMode(RotationMode_both);
             event->accept();
-        }
-        else if (hasDragged && !inTickArea) {
+        } else if (hasDragged && !inTickArea) {
             event->accept();
         } else if (!hasDragged && inTickArea) {
             if (m_dragState == DragState_recognizing) {
