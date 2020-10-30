@@ -57,36 +57,55 @@ private slots:
         QCOMPARE(o.inversePos(o.transformPos(QPoint{500, 50})), (QPoint{500, 50}));
     }
 
-    void test_case_mode()
+    void test_case_mode_both()
     {
         GeometryCalculator o;
-        QCOMPARE(o.getRotationMode(), RotationMode_both);
-        QCOMPARE(o.getRotation(), 0.0f);
+        o.setRotationMode(RotationMode_both);
 
-        o.setRotation(0);
-        QCOMPARE(o.getRotationMode(), RotationMode_both);
-        QCOMPARE(o.getRotation(), 0.0f);
-
-        o.setRotation(-1);
-        QCOMPARE(o.getRotationMode(), RotationMode_up);
-        QCOMPARE(o.getRotation(), -1.0f);
-
-        o.setRotation(-91);
+        o.setRotation(-91.0f);
         QCOMPARE(o.getRotation(), -90.0f);
 
-        o.setRotation(1);
+        o.setRotation(-45.0f);
+        QCOMPARE(o.getRotation(), -45.0f);
+
+        o.setRotation(0.0f);
         QCOMPARE(o.getRotation(), 0.0f);
 
+        o.setRotation(45.0f);
+        QCOMPARE(o.getRotation(), 45.0f);
+
+        o.setRotation(91.0f);
+        QCOMPARE(o.getRotation(), 90.0f);
+    }
+
+    void test_case_mode_down()
+    {
+        GeometryCalculator o;
         o.setRotationMode(RotationMode_down);
 
-        o.setRotation(1);
-        QCOMPARE(o.getRotation(), 1.0f);
-
-        o.setRotation(91);
-        QCOMPARE(o.getRotation(), 90.0f);
-
-        o.setRotation(-1);
+        o.setRotation(-1.0f);
         QCOMPARE(o.getRotation(), 0.0f);
+
+        o.setRotation(45.0f);
+        QCOMPARE(o.getRotation(), 45.0f);
+
+        o.setRotation(91.0f);
+        QCOMPARE(o.getRotation(), 90.0f);
+    }
+
+    void test_case_mode_up()
+    {
+        GeometryCalculator o;
+        o.setRotationMode(RotationMode_up);
+
+        o.setRotation(1.0f);
+        QCOMPARE(o.getRotation(), 0.0f);
+
+        o.setRotation(-45.0f);
+        QCOMPARE(o.getRotation(), -45.0f);
+
+        o.setRotation(-91.0f);
+        QCOMPARE(o.getRotation(), -90.0f);
     }
 };
 
