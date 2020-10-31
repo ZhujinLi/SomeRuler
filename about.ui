@@ -32,7 +32,7 @@
       <set>QTextEdit::AutoNone</set>
      </property>
      <property name="markdown">
-      <string>SomeRuler 2.2.1
+      <string>SomeRuler v2.2.1
 
 &lt;[github.com/ZhujinLi/SomeRuler](https://www.github.com/ZhujinLi/SomeRuler)&gt;
 
@@ -43,7 +43,7 @@
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:8px; margin-bottom:8px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;SomeRuler 2.2.1&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:8px; margin-bottom:8px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;SomeRuler v2.2.1&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:8px; margin-bottom:8px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&amp;lt;&lt;a href=&quot;https://www.github.com/ZhujinLi/SomeRuler&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;github.com/ZhujinLi/SomeRuler&lt;/span&gt;&lt;/a&gt;&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="openExternalLinks">

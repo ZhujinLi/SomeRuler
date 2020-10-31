@@ -1,4 +1,4 @@
-﻿#include "qkruler.h"
+﻿#include "someruler.h"
 
 #include <QApplication>
 #include <QBitmap>
@@ -34,11 +34,11 @@ static int _QPoint_length(const QPoint& p)
     return static_cast<int>(len + 0.5f);
 }
 
-QkRuler::QkRuler(QWidget *parent)
-    : QWidget(parent,Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint),
-      m_selectedTick(-1),
-      m_handleHighlighted(false),
-      m_dragState(DragState_idle)
+SomeRuler::SomeRuler(QWidget *parent)
+    : QWidget(parent, Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint)
+    , m_selectedTick(-1)
+    , m_handleHighlighted(false)
+    , m_dragState(DragState_idle)
 {
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -54,19 +54,16 @@ QkRuler::QkRuler(QWidget *parent)
 
 }
 
-QkRuler::~QkRuler()
-{
+SomeRuler::~SomeRuler() {}
 
-}
-
-void QkRuler::_appear()
+void SomeRuler::_appear()
 {
     show();
     raise();
     activateWindow();
 }
 
-void QkRuler::_initTray()
+void SomeRuler::_initTray()
 {
     QSystemTrayIcon* trayIcon = new QSystemTrayIcon(this);
     trayIcon->setIcon(QIcon(":/images/app.png"));
@@ -74,25 +71,24 @@ void QkRuler::_initTray()
     QMenu* trayIconMenu = new QMenu(this);
 
     QAction* showAction = new QAction(tr("&Show"), this);
-    connect(showAction, &QAction::triggered, this, &QkRuler::_appear);
+    connect(showAction, &QAction::triggered, this, &SomeRuler::_appear);
     trayIconMenu->addAction(showAction);
 
     QAction* aboutAction = new QAction(tr("&About..."), this);
-    connect(aboutAction, &QAction::triggered, this, &QkRuler::_about);
+    connect(aboutAction, &QAction::triggered, this, &SomeRuler::_about);
     trayIconMenu->addAction(aboutAction);
 
     QAction* quitAction = new QAction(tr("&Quit"), this);
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     trayIconMenu->addAction(quitAction);
 
-    connect(trayIcon, &QSystemTrayIcon::activated, this, &QkRuler::iconActivated);
+    connect(trayIcon, &QSystemTrayIcon::activated, this, &SomeRuler::iconActivated);
 
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->show();
 }
 
-
-void QkRuler::keyReleaseEvent(QKeyEvent *event)
+void SomeRuler::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key()) {
     case Qt::Key_Escape:
@@ -103,7 +99,7 @@ void QkRuler::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-void QkRuler::_updateMask()
+void SomeRuler::_updateMask()
 {
     QBitmap mask(m_geoCalc.getWindowSize());
     mask.clear();
@@ -120,7 +116,7 @@ void QkRuler::_updateMask()
     setMask(mask);
 }
 
-QBitmap QkRuler::_handleMask()
+QBitmap SomeRuler::_handleMask()
 {
     QBitmap mask(m_geoCalc.getWindowSize());
     mask.clear();
@@ -139,14 +135,13 @@ QBitmap QkRuler::_handleMask()
     return mask;
 }
 
-QPoint QkRuler::_handlePos()
+QPoint SomeRuler::_handlePos()
 {
     QSize sz = m_geoCalc.getRulerSize();
     return {sz.width() - HANDLE_MARGIN, sz.height() / 2};
 }
 
-
-void QkRuler::paintEvent(QPaintEvent *)
+void SomeRuler::paintEvent(QPaintEvent *)
 {
     QSize rulerSize = m_geoCalc.getRulerSize();
     int w = rulerSize.width();
@@ -214,7 +209,7 @@ void QkRuler::paintEvent(QPaintEvent *)
     painter.drawEllipse(handleCenter, HANDLE_RADIUS, HANDLE_RADIUS);
 }
 
-bool QkRuler::_inHandleArea(QPoint pos)
+bool SomeRuler::_inHandleArea(QPoint pos)
 {
     QPoint handlePos = m_geoCalc.transformPos(_handlePos());
     QRect handleArea(handlePos.x() - HANDLE_DETECT_RADIUS,
@@ -222,7 +217,7 @@ bool QkRuler::_inHandleArea(QPoint pos)
     return handleArea.contains(pos);
 }
 
-void QkRuler::_highlightHandle(bool in)
+void SomeRuler::_highlightHandle(bool in)
 {
     if (in != m_handleHighlighted) {
         m_handleHighlighted = in;
@@ -230,7 +225,7 @@ void QkRuler::_highlightHandle(bool in)
     }
 }
 
-void QkRuler::_updateWindowGeometry()
+void SomeRuler::_updateWindowGeometry()
 {
     QSize newSize = m_geoCalc.getWindowSize();
 
@@ -249,7 +244,7 @@ void QkRuler::_updateWindowGeometry()
     _updateMask();
 }
 
-QString QkRuler::_makeInfoText()
+QString SomeRuler::_makeInfoText()
 {
     QSize rulerSize = m_geoCalc.getRulerSize();
     int w = rulerSize.width();
@@ -262,7 +257,7 @@ QString QkRuler::_makeInfoText()
     return text;
 }
 
-void QkRuler::_reset()
+void SomeRuler::_reset()
 {
     m_geoCalc.setRulerLength(600);
     m_geoCalc.setRotationMode(RotationMode_both);
@@ -284,7 +279,7 @@ void QkRuler::_reset()
     update();
 }
 
-void QkRuler::_about()
+void SomeRuler::_about()
 {
     QDialog* dialog = new QDialog(this);
     Ui::About aboutUi;
@@ -308,7 +303,7 @@ void QkRuler::_about()
     );
 }
 
-void QkRuler::iconActivated(QSystemTrayIcon::ActivationReason reason)
+void SomeRuler::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
     case QSystemTrayIcon::DoubleClick:
@@ -319,7 +314,7 @@ void QkRuler::iconActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
-void QkRuler::mousePressEvent(QMouseEvent *event)
+void SomeRuler::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -329,7 +324,7 @@ void QkRuler::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void QkRuler::mouseMoveEvent(QMouseEvent *event)
+void SomeRuler::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         if (event->localPos() != m_dragPosition) {
@@ -384,7 +379,7 @@ void QkRuler::mouseMoveEvent(QMouseEvent *event)
     event->accept();
 }
 
-void QkRuler::mouseReleaseEvent(QMouseEvent *event)
+void SomeRuler::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         QPoint rawPos = m_geoCalc.inversePos(event->localPos().toPoint());
@@ -414,7 +409,7 @@ void QkRuler::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void QkRuler::mouseDoubleClickEvent(QMouseEvent *event)
+void SomeRuler::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (_inHandleArea(event->localPos().toPoint())) {
         _reset();

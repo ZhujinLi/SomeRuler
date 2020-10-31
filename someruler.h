@@ -1,18 +1,18 @@
-#ifndef QKRULER_H
-#define QKRULER_H
+#ifndef SOMERULER_H
+#define SOMERULER_H
 
 #include "geometrycalculator.h"
 
 #include <QSystemTrayIcon>
 #include <QWidget>
 
-class QkRuler : public QWidget
+class SomeRuler : public QWidget
 {
     Q_OBJECT
 
 public:
-    QkRuler(QWidget *parent = nullptr);
-    ~QkRuler() override;
+    SomeRuler(QWidget *parent = nullptr);
+    ~SomeRuler() override;
 
 protected:
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -54,4 +54,4 @@ private slots:
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
 };
 
-#endif // QKRULER_H
+#endif // SOMERULER_H

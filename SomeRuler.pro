@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = QkRuler
+TARGET = SomeRuler
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -27,11 +27,11 @@ CONFIG += c++11
 SOURCES += \
         geometrycalculator.cpp \
         main.cpp \
-        qkruler.cpp
+        someruler.cpp
 
 HEADERS += \
         geometrycalculator.h \
-        qkruler.h
+        someruler.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

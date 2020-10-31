@@ -1,4 +1,4 @@
-#include "qkruler.h"
+#include "someruler.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
-    QkRuler w;
+    SomeRuler w;
     w.setWindowIcon(QIcon(":/images/app.png"));
     w.show();
 
