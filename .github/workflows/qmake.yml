@@ -1,0 +1,45 @@
+name: QMake
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: '5.13.2'
+
+    - name: Prepare makefile
+      run: qmake SomeRuler.pro
+
+    - name: Build
+      run: make
+
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: SomeRulerTest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: '5.13.2'
+
+    - name: Prepare makefile
+      run: qmake SomeRulerTest.pro
+
+    - name: Build test
+      run: make
+
+    - name: Run test without GUI
+      run: export QT_QPA_PLATFORM=offscreen && ./SomeRulerTest
