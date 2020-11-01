@@ -222,7 +222,7 @@ QString SomeRuler::_makeInfoText() {
     QString text = QString::number(num2Show) + " px";
     qreal rotation = abs(m_geoCalc.getRotation());
     if (rotation != 90 && rotation != 0) {
-        text += ", " + QString::number(rotation, 'f', 1) + "°";
+        text += ", " + QString::number(rotation, 'f', 1) + " deg";
     }
     return text;
 }
