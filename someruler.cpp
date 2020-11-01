@@ -247,11 +247,7 @@ void SomeRuler::_about() {
     aboutUi.setupUi(dialog);
     dialog->show();
 
-    QSize size = dialog->size();
-    qreal h = (aboutUi.textBrowser->document()->size().height() + dialog->layout()->margin() * 2) * 1.2;
-    size.setWidth(static_cast<int>(h * size.width() / size.height()));
-    size.setHeight(static_cast<int>(h));
-    dialog->setFixedSize(size);
+    dialog->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     QScreen *screen = dialog->window()->windowHandle()->screen();
     dialog->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, dialog->size(), screen->geometry()));
