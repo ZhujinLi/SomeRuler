@@ -12,10 +12,12 @@ Features & usage:
 
 - Cross platform (tested under Windows 10 and macOS Catalina +)
 - High DPI support
+- Rotation support (with angle readings): drag the circle handle upward or downward
 - Resizing: drag the circle handle horizontally
-- Rotation & angle readings: drag the circle handle upward or downward
-- Length readings: click on the tick to read the length
+- Length reading: click on the ticks
 - Reset: double click on the circle handle
 - Hiding: press ESC key
+
+Stable builds can be downloaded from [Releases Page](https://github.com/ZhujinLi/SomeRuler/releases).
 
 ![Preview](preview.jpg)
