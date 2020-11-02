@@ -302,6 +302,7 @@ void SomeRuler::mouseMoveEvent(QMouseEvent *event) {
             break;
         case DragState_resizing: {
             int len = static_cast<int>(roundf(sqrtf(static_cast<float>(QPoint::dotProduct(delta, delta)))));
+            len += HANDLE_MARGIN;
             m_geoCalc.setRulerLength(len);
             _updateWindowGeometry();
             break;
