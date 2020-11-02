@@ -144,14 +144,17 @@ void SomeRuler::paintEvent(QPaintEvent *) {
     painter.setClipping(false);
 
     // Ticks
-    for (int tick = 0; tick < w; tick++) {
-        if (tick % 2 == 0) {
-            double len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5;
-            bool isSelected = tick == (m_selectedTick | 1) - 1;
-            painter.setPen(isSelected ? Qt::red : Qt::black);
-            painter.drawLine(QPointF{tick + .5, .5}, QPointF{tick + .5, .5 + len});
-            painter.drawLine(QPointF{tick + .5, h + .5}, QPointF{tick + .5, h + .5 - len});
-        }
+    painter.setPen(Qt::black);
+    for (int tick = 0; tick < w; tick += 2) {
+        double len = tick % 100 == 0 ? 15 : tick % 10 == 0 ? 10 : 5;
+        painter.drawLine(QPointF{tick + .5, .5}, QPointF{tick + .5, .5 + len});
+        painter.drawLine(QPointF{tick + .5, h + .5}, QPointF{tick + .5, h + .5 - len});
+    }
+
+    // Selected tick
+    if (m_selectedTick >= 0) {
+        painter.setPen(Qt::red);
+        painter.drawLine(QPointF{m_selectedTick + .5, .5}, QPointF{m_selectedTick + .5, h + .5});
     }
 
     // Labels
