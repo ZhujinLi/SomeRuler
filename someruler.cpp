@@ -1,5 +1,5 @@
 ﻿#include "someruler.h"
-
+#include "ui_about.h"
 #include <QApplication>
 #include <QBitmap>
 #include <QCoreApplication>
@@ -12,7 +12,6 @@
 #include <QWindow>
 #include <QtDebug>
 #include <QtMath>
-#include <ui_about.h>
 
 static const int HANDLE_RADIUS = 4;
 static const int HANDLE_MARGIN = 20;
@@ -23,6 +22,10 @@ SomeRuler::SomeRuler(QWidget *parent)
     : QWidget(parent, Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint), m_selectedTick(-1),
       m_handleHighlighted(false), m_dragState(DragState_idle) {
     setAttribute(Qt::WA_TranslucentBackground);
+
+#ifdef Q_OS_MACOS
+    setAttribute(Qt::WA_MacAlwaysShowToolWindow);
+#endif
 
     m_geoCalc.setPaddings(5); // For anti-aliasing
 
