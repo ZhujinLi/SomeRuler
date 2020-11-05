@@ -16,6 +16,8 @@ public:
 
     /// @param len
     /// Ruler's horizontal length in pixels.
+    /// @note
+    /// It has a lower limit for UX considerations.
     void setRulerLength(int len);
 
     /// Ruler's intrinsic dimension.
@@ -45,6 +47,10 @@ public:
 
     /// @sa transformPos
     QTransform getTransform() const { return m_transform; }
+
+    /// Get the vector of ruler's main direction, in screen space, with magnitude 100.
+    /// It's (100, 0) in the default state.
+    QPoint getMainDirection() const;
 
 private:
     void _update();

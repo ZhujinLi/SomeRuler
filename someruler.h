@@ -12,7 +12,12 @@ public:
     SomeRuler(QWidget *parent = nullptr);
     virtual ~SomeRuler() override;
 
-protected:
+private slots:
+    void _appear();
+    void _about();
+    void _iconActivated(QSystemTrayIcon::ActivationReason reason);
+
+private:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
     virtual void paintEvent(QPaintEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
@@ -20,11 +25,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-private:
     void _reset();
-    void _about();
-    void _iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void _appear();
     void _initTray();
     QPoint _handlePos();
     QBitmap _handleMask();

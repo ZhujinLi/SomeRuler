@@ -307,10 +307,12 @@ void SomeRuler::mouseMoveEvent(QMouseEvent *event) {
             move(event->globalPos() - m_dragPosition);
             break;
         case DragState_resizing: {
-            int len = static_cast<int>(roundf(sqrtf(static_cast<float>(QPoint::dotProduct(delta, delta)))));
-            len += HANDLE_MARGIN;
-            m_geoCalc.setRulerLength(len);
-            _updateWindowGeometry();
+            if (QPoint::dotProduct(delta, m_geoCalc.getMainDirection()) > 0) {
+                int len = static_cast<int>(roundf(sqrtf(static_cast<float>(QPoint::dotProduct(delta, delta)))));
+                len += HANDLE_MARGIN;
+                m_geoCalc.setRulerLength(len);
+                _updateWindowGeometry();
+            }
             break;
         }
         case DragState_rotating: {

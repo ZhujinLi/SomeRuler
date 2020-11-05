@@ -89,6 +89,18 @@ private slots:
         o.setRotation(-91.0f);
         QCOMPARE(o.getRotation(), -90.0f);
     }
+
+    void calculatesMainDirection() {
+        GeometryCalculator o;
+        QCOMPARE(o.getMainDirection(), (QPoint{100, 0}));
+
+        o.setRotation(90);
+        QCOMPARE(o.getMainDirection(), (QPoint{0, 100}));
+
+        o.setRotationState(RotationState::up);
+        o.setRotation(-90);
+        QCOMPARE(o.getMainDirection(), (QPoint{0, -100}));
+    }
 };
 
 QTEST_MAIN(TstGeometryCalculator)

@@ -10,7 +10,7 @@ GeometryCalculator::GeometryCalculator() {
 }
 
 void GeometryCalculator::setRulerLength(int len) {
-    len = qMax(len, 100);
+    len = qMax(len, 150);
 
     QSize size(len, 100);
 
@@ -46,6 +46,13 @@ void GeometryCalculator::setRotation(qreal rotation) {
 QPoint GeometryCalculator::transformPos(const QPoint &pos) const { return pos * m_transform; }
 
 QPoint GeometryCalculator::inversePos(const QPoint &pos) const { return pos * m_invTransform; }
+
+QPoint GeometryCalculator::getMainDirection() const {
+    qreal rotationInRadius = qDegreesToRadians(m_rotation);
+    int x = static_cast<int>(cos(rotationInRadius) * 100);
+    int y = static_cast<int>(sin(rotationInRadius) * 100);
+    return QPoint{x, y};
+}
 
 void GeometryCalculator::_update() {
     int w = m_rulerSize.width();
