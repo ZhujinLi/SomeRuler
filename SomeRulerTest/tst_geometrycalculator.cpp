@@ -13,7 +13,7 @@ class TstGeometryCalculator : public QObject {
     Q_OBJECT
 
 private slots:
-    void test_case_window_size() {
+    void windowSizeIsMinimalBBox() {
         GeometryCalculator o;
         o.setRulerLength(1000);
         QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{1100, 100}));
@@ -23,18 +23,13 @@ private slots:
 
         o.setRotation(90);
         QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(), QSize{100, 1000}));
-    }
-
-    void test_case_window_size_neg() {
-        GeometryCalculator o;
-        o.setRulerLength(1000);
 
         o.setRotation(-45);
         QVERIFY(_QSize_fuzzyCompare(o.getWindowSize(),
                                     QSize{int(100 + 1000 / 1.414 + 100 / 1.414), int(1000 / 1.414 + 100)}));
     }
 
-    void test_case_transform() {
+    void transformAndInversionAreUniform() {
         GeometryCalculator o;
         o.setRulerLength(1000);
 
@@ -42,17 +37,12 @@ private slots:
 
         o.setRotation(90);
         QCOMPARE(o.inversePos(o.transformPos(QPoint{500, 50})), (QPoint{500, 50}));
-    }
-
-    void test_case_transform_neg() {
-        GeometryCalculator o;
-        o.setRulerLength(1000);
 
         o.setRotation(-90);
         QCOMPARE(o.inversePos(o.transformPos(QPoint{500, 50})), (QPoint{500, 50}));
     }
 
-    void test_case_mode_both() {
+    void handlesRotationInFlatState() {
         GeometryCalculator o;
         o.setRotationState(RotationState::flat);
 
@@ -72,7 +62,7 @@ private slots:
         QCOMPARE(o.getRotation(), 90.0f);
     }
 
-    void test_case_mode_down() {
+    void handlesRotationInDownState() {
         GeometryCalculator o;
         o.setRotationState(RotationState::down);
 
@@ -86,7 +76,7 @@ private slots:
         QCOMPARE(o.getRotation(), 90.0f);
     }
 
-    void test_case_mode_up() {
+    void handlesRotationInUpState() {
         GeometryCalculator o;
         o.setRotationState(RotationState::up);
 
