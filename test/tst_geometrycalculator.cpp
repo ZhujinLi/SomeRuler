@@ -1,4 +1,4 @@
-#include "../geometrycalculator.h"
+#include "../src/geometrycalculator.h"
 #include <QtTest>
 
 static const int TOLERANCE = 2;

@@ -25,13 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        geometrycalculator.cpp \
-        main.cpp \
-        someruler.cpp
+        src/geometrycalculator.cpp \
+        src/main.cpp \
+        src/someruler.cpp
 
 HEADERS += \
-        geometrycalculator.h \
-        someruler.h
+        src/geometrycalculator.h \
+        src/someruler.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -42,7 +42,7 @@ RESOURCES += \
     res.qrc
 
 FORMS += \
-    about.ui
+    src/about.ui
 
 RC_ICONS = images/app.ico
 
