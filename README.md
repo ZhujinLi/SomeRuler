@@ -20,4 +20,6 @@ Features & usage:
 
 Stable builds can be downloaded from [Releases Page](https://github.com/ZhujinLi/SomeRuler/releases).
 
+Developed with Qt 5.15.2 as it's the version supported on Felgo CI/CD platform.
+
 ![Preview](preview.jpg)
