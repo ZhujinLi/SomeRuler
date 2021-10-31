@@ -16,7 +16,6 @@ private slots:
     void _appear();
     void _about();
     void _iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void _screenChanged(QScreen* screen);
 
 private:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -29,11 +28,9 @@ private:
     void _reset();
     void _initTray();
     QPoint _handlePos();
-    QBitmap _handleMask();
-    void _updateMask();
     bool _isPosInHandleArea(QPoint pos);
     void _highlightHandle(bool in);
-    void _updateWindowGeometry();
+    void _syncGeometryWithCalculator();
     QString _makeInfoText();
 
     enum DragState { DragState_idle, DragState_recognizing, DragState_moving, DragState_rotating, DragState_resizing };
