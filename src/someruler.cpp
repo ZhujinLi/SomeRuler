@@ -36,6 +36,8 @@ SomeRuler::SomeRuler(QWidget *parent)
     _appear();
 
     _reset();
+
+    m_intrinsicDevicePixelRatio = devicePixelRatio();
 }
 
 SomeRuler::~SomeRuler() {}
@@ -78,6 +80,28 @@ void SomeRuler::keyReleaseEvent(QKeyEvent *event) {
     default:
         break;
     }
+}
+
+void SomeRuler::_updateMask() {
+    // A workaround to fix display issues after screen changes
+    qreal screenRatio = static_cast<qreal>(devicePixelRatio()) / m_intrinsicDevicePixelRatio;
+
+    QBitmap mask(m_geoCalc.getWindowSize() * screenRatio);
+    mask.clear();
+
+    QPainter painter(&mask);
+    QTransform transform = m_geoCalc.getTransform();
+    transform.scale(screenRatio, screenRatio);
+    painter.setTransform(transform);
+
+    // Ruler rect
+    painter.setBrush(Qt::color1);
+    QSize rulerSize = m_geoCalc.getRulerSize() * screenRatio;
+    QRect rect(QPoint(0, 0), rulerSize);
+    rect = rect.marginsAdded(QMargins(1, 1, 1, 1)); // Expand for AA
+    painter.drawRect(rect);
+
+    setMask(mask);
 }
 
 QPoint SomeRuler::_handlePos() {
@@ -178,6 +202,8 @@ void SomeRuler::_syncGeometryWithCalculator() {
 
     QRect newGeometry(newTopLeft, newSize);
     setGeometry(newGeometry);
+
+    _updateMask();
 }
 
 QString SomeRuler::_makeInfoText() {

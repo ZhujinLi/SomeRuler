@@ -28,6 +28,7 @@ private:
     void _reset();
     void _initTray();
     QPoint _handlePos();
+    void _updateMask();
     bool _isPosInHandleArea(QPoint pos);
     void _highlightHandle(bool in);
     void _syncGeometryWithCalculator();
@@ -40,6 +41,7 @@ private:
     int m_selectedTick;
     bool m_handleHighlighted;
     DragState m_dragState;
+    int m_intrinsicDevicePixelRatio;
 };
 
 #endif // SOMERULER_H
