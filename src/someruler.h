@@ -16,6 +16,7 @@ private slots:
     void _appear();
     void _about();
     void _iconActivated(QSystemTrayIcon::ActivationReason reason);
+    void _screenChanged(QScreen* screen);
 
 private:
     virtual void keyReleaseEvent(QKeyEvent *event) override;

@@ -36,6 +36,8 @@ SomeRuler::SomeRuler(QWidget *parent)
     _appear();
 
     _reset();
+
+    connect(window()->windowHandle(), &QWindow::screenChanged, this, &SomeRuler::_screenChanged);
 }
 
 SomeRuler::~SomeRuler() {}
@@ -81,6 +83,7 @@ void SomeRuler::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void SomeRuler::_updateMask() {
+    return;
     QBitmap mask(m_geoCalc.getWindowSize());
     mask.clear();
 
@@ -134,14 +137,14 @@ void SomeRuler::paintEvent(QPaintEvent *) {
     // Rect
     QRectF rulerRect = QRectF{.5, .5, w + .0, h + .0};
     if (!m_handleHighlighted) {
-        painter.setClipping(true);
-        painter.setClipRegion(_handleMask());
+        // painter.setClipping(true);
+        // painter.setClipRegion(_handleMask());
     }
     painter.setTransform(m_geoCalc.getTransform()); // After setting clipper
     painter.setBrush(QColor(0xff, 0xff, 0xff, 0xc0));
     painter.setPen(Qt::black);
     painter.drawRect(rulerRect);
-    painter.setClipping(false);
+    // painter.setClipping(false);
 
     // Ticks
     painter.setPen(Qt::black);
@@ -204,6 +207,7 @@ void SomeRuler::_highlightHandle(bool in) {
 }
 
 void SomeRuler::_updateWindowGeometry() {
+    qInfo() << "_updateWindowGeometry()" << rand();
     QSize newSize = m_geoCalc.getWindowSize();
 
     QPoint newTopLeft;
@@ -268,6 +272,11 @@ void SomeRuler::_iconActivated(QSystemTrayIcon::ActivationReason reason) {
     }
 }
 
+void SomeRuler::_screenChanged(QScreen *) {
+    qInfo() << "_screenChanged()";
+    _updateWindowGeometry();
+}
+
 void SomeRuler::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -305,6 +314,7 @@ void SomeRuler::mouseMoveEvent(QMouseEvent *event) {
         switch (m_dragState) {
         case DragState_moving:
             move(event->globalPos() - m_dragPosition);
+            _updateWindowGeometry();
             break;
         case DragState_resizing: {
             if (QPoint::dotProduct(delta, m_geoCalc.getMainDirection()) > 0) {
