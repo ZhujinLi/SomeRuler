@@ -28,11 +28,10 @@ private:
     void _reset();
     void _initTray();
     QPoint _handlePos();
-    QBitmap _handleMask();
     void _updateMask();
     bool _isPosInHandleArea(QPoint pos);
     void _highlightHandle(bool in);
-    void _updateWindowGeometry();
+    void _syncGeometryWithCalculator();
     QString _makeInfoText();
 
     enum DragState { DragState_idle, DragState_recognizing, DragState_moving, DragState_rotating, DragState_resizing };
@@ -42,6 +41,7 @@ private:
     int m_selectedTick;
     bool m_handleHighlighted;
     DragState m_dragState;
+    int m_intrinsicDevicePixelRatio;
 };
 
 #endif // SOMERULER_H

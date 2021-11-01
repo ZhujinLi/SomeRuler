@@ -36,6 +36,8 @@ SomeRuler::SomeRuler(QWidget *parent)
     _appear();
 
     _reset();
+
+    m_intrinsicDevicePixelRatio = devicePixelRatio();
 }
 
 SomeRuler::~SomeRuler() {}
@@ -81,37 +83,25 @@ void SomeRuler::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void SomeRuler::_updateMask() {
-    QBitmap mask(m_geoCalc.getWindowSize());
+    // A workaround to fix display issues after screen changes
+    qreal screenRatio = static_cast<qreal>(devicePixelRatio()) / m_intrinsicDevicePixelRatio;
+
+    QBitmap mask(m_geoCalc.getWindowSize() * screenRatio);
     mask.clear();
 
     QPainter painter(&mask);
-    painter.setTransform(m_geoCalc.getTransform());
+    QTransform transform = m_geoCalc.getTransform();
+    transform.scale(screenRatio, screenRatio);
+    painter.setTransform(transform);
 
     // Ruler rect
     painter.setBrush(Qt::color1);
-    QRect rect(0, 0, m_geoCalc.getRulerSize().width(), m_geoCalc.getRulerSize().height());
+    QSize rulerSize = m_geoCalc.getRulerSize() * screenRatio;
+    QRect rect(QPoint(0, 0), rulerSize);
     rect = rect.marginsAdded(QMargins(1, 1, 1, 1)); // Expand for AA
     painter.drawRect(rect);
 
     setMask(mask);
-}
-
-QBitmap SomeRuler::_handleMask() {
-    QBitmap mask(m_geoCalc.getWindowSize());
-    mask.clear();
-
-    QPainter painter(&mask);
-    painter.setBrush(Qt::color1);
-    painter.drawRect(QRect{0, 0, m_geoCalc.getWindowSize().width(), m_geoCalc.getWindowSize().height()});
-
-    // Hole at handle
-    painter.setTransform(m_geoCalc.getTransform());
-    painter.setBrush(Qt::color0);
-    painter.setPen(Qt::NoPen);
-    QPoint handleCenter = _handlePos();
-    painter.drawEllipse(handleCenter, HANDLE_RADIUS, HANDLE_RADIUS);
-
-    return mask;
 }
 
 QPoint SomeRuler::_handlePos() {
@@ -133,15 +123,10 @@ void SomeRuler::paintEvent(QPaintEvent *) {
 
     // Rect
     QRectF rulerRect = QRectF{.5, .5, w + .0, h + .0};
-    if (!m_handleHighlighted) {
-        painter.setClipping(true);
-        painter.setClipRegion(_handleMask());
-    }
     painter.setTransform(m_geoCalc.getTransform()); // After setting clipper
     painter.setBrush(QColor(0xff, 0xff, 0xff, 0xc0));
     painter.setPen(Qt::black);
     painter.drawRect(rulerRect);
-    painter.setClipping(false);
 
     // Ticks
     painter.setPen(Qt::black);
@@ -203,7 +188,7 @@ void SomeRuler::_highlightHandle(bool in) {
     }
 }
 
-void SomeRuler::_updateWindowGeometry() {
+void SomeRuler::_syncGeometryWithCalculator() {
     QSize newSize = m_geoCalc.getWindowSize();
 
     QPoint newTopLeft;
@@ -237,7 +222,7 @@ void SomeRuler::_reset() {
     m_geoCalc.setRulerLength(600);
     m_geoCalc.setRotationState(RotationState::flat);
     m_geoCalc.setRotation(0);
-    _updateWindowGeometry();
+    _syncGeometryWithCalculator();
 
     QScreen *screen = window()->windowHandle()->screen();
     setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size(), screen->geometry()));
@@ -305,20 +290,21 @@ void SomeRuler::mouseMoveEvent(QMouseEvent *event) {
         switch (m_dragState) {
         case DragState_moving:
             move(event->globalPos() - m_dragPosition);
+            _syncGeometryWithCalculator(); // Needs this in case there are errors when setting geometry
             break;
         case DragState_resizing: {
             if (QPoint::dotProduct(delta, m_geoCalc.getMainDirection()) > 0) {
                 int len = static_cast<int>(roundf(sqrtf(static_cast<float>(QPoint::dotProduct(delta, delta)))));
                 len += HANDLE_MARGIN;
                 m_geoCalc.setRulerLength(len);
-                _updateWindowGeometry();
+                _syncGeometryWithCalculator();
             }
             break;
         }
         case DragState_rotating: {
             qreal angle = qRadiansToDegrees(atan2(delta.y(), delta.x()));
             m_geoCalc.setRotation(angle);
-            _updateWindowGeometry();
+            _syncGeometryWithCalculator();
             break;
         }
         default:
